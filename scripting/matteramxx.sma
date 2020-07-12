@@ -3,7 +3,7 @@
 // enable if you want to use HamSandwich (recommended)
 // disable if you want to use DeathMsg, for example
 // in games that do not have HamSandwich support
-#define USE_HAMSANDWICH 1 
+#define USE_HAMSANDWICH 1
 
 // enable if you want to use extended string buffers, 
 // most of the time you won't need it, but you may 
@@ -12,8 +12,6 @@
 #define USE_EXTENDED_BUFFER 0
 
 // ** COMPILER OPTIONS END HERE **
-
-#pragma semicolon 1
 
 #if USE_EXTENDED_BUFFER > 0
     #pragma dynamic 65536
@@ -53,11 +51,13 @@
     #define MAX_NAME_LENGTH 32
 #endif
 
+#define REGEX_STEAMID_PATTERN "^^STEAM_(0|1):(0|1):\d+$"
+
 #define MATTERAMXX_PLUGIN_NAME "MatterAMXX"
 #define MATTERAMXX_PLUGIN_AUTHOR "Gabe Iggy"
-#define MATTERAMXX_PLUGIN_VERSION "1.3.2"
+#define MATTERAMXX_PLUGIN_VERSION "1.4rc"
 
-#define REGEX_STEAMID_PATTERN "^^STEAM_(0|1):(0|1):\d+$"
+#pragma semicolon 1
 
 new g_cvarEnabled;
 new g_cvarSystemAvatarUrl;
@@ -67,12 +67,14 @@ new g_cvarBridgeUrl;
 new g_cvarBridgeGateway;
 new g_cvarToken;
 new g_cvarIncoming;
+new g_cvarIncoming_Chat_DisplayProtocol;
 new g_cvarIncoming_Chat_RefreshTime;
 new g_cvarOutgoing;
 new g_cvarOutgoing_SystemUsername;
 new g_cvarOutgoing_Chat;
 new g_cvarOutgoing_Chat_Team;
 new g_cvarOutgoing_Chat_SpamFil;
+new g_cvarOutgoing_Chat_ZeroifyAtSign;
 new g_cvarOutgoing_Kills;
 new g_cvarOutgoing_Join;
 new g_cvarOutgoing_Join_Delay;
@@ -125,19 +127,21 @@ public plugin_init()
     register_plugin(MATTERAMXX_PLUGIN_NAME, MATTERAMXX_PLUGIN_VERSION, MATTERAMXX_PLUGIN_AUTHOR);
 
     g_cvarEnabled = register_cvar("amx_matter_enable", "1");
-    g_cvarSystemAvatarUrl = register_cvar("amx_matter_system_avatar", "");
-    g_cvarAutogenAvatarUrl = register_cvar("amx_matter_autogenerate_avatar", ""); //https://robohash.org/%s.png?set=set4
-    g_cvarAvatarUrl = register_cvar("amx_matter_player_avatar", ""); //http://localhost/avatars/get_avatar.php?steamid=%s
-    g_cvarBridgeUrl = register_cvar("amx_matter_bridge_url", "http://localhost:1337");
-    g_cvarBridgeGateway = register_cvar("amx_matter_bridge_gateway", g_sGamename);
-    g_cvarToken = register_cvar("amx_matter_bridge_token", "");
+    g_cvarSystemAvatarUrl = register_cvar("amx_matter_system_avatar", "", FCVAR_PROTECTED);
+    g_cvarAutogenAvatarUrl = register_cvar("amx_matter_autogenerate_avatar", "", FCVAR_PROTECTED); //https://robohash.org/%s.png?set=set4
+    g_cvarAvatarUrl = register_cvar("amx_matter_player_avatar", "", FCVAR_PROTECTED); //http://localhost/avatars/get_avatar.php?steamid=%s
+    g_cvarBridgeUrl = register_cvar("amx_matter_bridge_url", "http://localhost:1337", FCVAR_PROTECTED);
+    g_cvarBridgeGateway = register_cvar("amx_matter_bridge_gateway", g_sGamename, FCVAR_PROTECTED);
+    g_cvarToken = register_cvar("amx_matter_bridge_token", "", FCVAR_PROTECTED);
     g_cvarIncoming = register_cvar("amx_matter_bridge_incoming", "1");
+    g_cvarIncoming_Chat_DisplayProtocol = register_cvar("amx_matter_bridge_incoming_chat_protocol", "0");
     g_cvarIncoming_Chat_RefreshTime = register_cvar("amx_matter_incoming_update_time", "3.0");
     g_cvarOutgoing = register_cvar("amx_matter_bridge_outgoing", "1");
     g_cvarOutgoing_SystemUsername = register_cvar("amx_matter_bridge_outgoing_system_username", sServername);
     g_cvarOutgoing_Chat = register_cvar("amx_matter_bridge_outgoing_chat", "1");
     g_cvarOutgoing_Chat_Team = register_cvar("amx_matter_bridge_outgoing_chat_team", "1");
     g_cvarOutgoing_Chat_SpamFil = register_cvar("amx_matter_bridge_outgoing_chat_no_repeat", "1");
+    g_cvarOutgoing_Chat_ZeroifyAtSign = register_cvar("amx_matter_bridge_outgoing_chat_zwsp_at", "1");
     g_cvarOutgoing_Kills = register_cvar("amx_matter_bridge_outgoing_kills", "1");
     g_cvarOutgoing_Join = register_cvar("amx_matter_bridge_outgoing_join", "1");
     g_cvarOutgoing_Join_Delay = register_cvar("amx_matter_bridge_outgoing_join_delay", "15.0");
@@ -147,6 +151,12 @@ public plugin_init()
     g_cvarOutgoing_DisplayMap = register_cvar("amx_matter_bridge_outgoing_display_map", "1");
     g_cvarOutgoing_JoinQuit_ShowCount = register_cvar("amx_matter_bridge_outgoing_joinquit_count", "1");
     g_cvarRetry_Delay = register_cvar("amx_matter_bridge_retry_delay", "3.0");
+
+    register_dictionary("matteramxx.txt");
+
+    //TS doesn't support rendering % 
+    if(is_running("ts"))
+        register_dictionary("matteramxx_old.txt");
 
     register_cvar("amx_matter_bridge_version", MATTERAMXX_PLUGIN_VERSION, FCVAR_SERVER);
 }
@@ -191,7 +201,8 @@ public plugin_cfg()
             if(get_pcvar_bool(g_cvarOutgoing_Kills))
             {
 #if USE_HAMSANDWICH > 0
-                RegisterHam(equali(g_sGamename, "tfc") ? Ham_TFC_Killed : Ham_Killed, "player", "player_killed", true);
+                new const b_isTFC = equali(g_sGamename, "tfc"); //tag mismatch if bool:
+                RegisterHam(b_isTFC ? Ham_TFC_Killed : Ham_Killed, "player", b_isTFC ? "player_killed_tfc" : "player_killed", true);
 #else 
                 register_event("DeathMsg", "player_killed_ev", "a");
 #endif
@@ -230,7 +241,7 @@ public plugin_cfg()
             g_fRetryDelay = get_pcvar_float(g_cvarRetry_Delay);
             g_fQueryDelay = get_pcvar_float(g_cvarIncoming_Chat_RefreshTime);
 
-            g_iPrintMessageForward = CreateMultiForward("matteramxx_print_message", ET_STOP, FP_STRING);
+            g_iPrintMessageForward = CreateMultiForward("matteramxx_print_message", ET_STOP, FP_STRING, FP_STRING, FP_STRING);
 
             set_task(g_fQueryDelay, "connect_api");
         }
@@ -273,7 +284,7 @@ public connect_api()
 
 public retry_connection()
 {
-    server_print("[MatterAMXX] Retrying in %f seconds...", g_fRetryDelay);
+    server_print("[MatterAMXX] %L", LANG_SERVER, "MATTERAMXX_RETRYING", floatround(g_fRetryDelay));
     set_task(g_fRetryDelay, "connect_api");
 }
 
@@ -281,7 +292,7 @@ public incoming_message()
 {
     if(grip_get_response_state() != GripResponseStateSuccessful)
     {
-        server_print("[MatterAMXX] Connection failed!");
+        server_print("[MatterAMXX] %L", LANG_SERVER, "MATTERAMXX_CONN_FAILED");
         retry_connection();
     }
     new sIncomingMessage[INCOMING_BUFFER_LENGTH], sJsonError[MESSAGE_LENGTH], GripJSONValue:gJson;
@@ -294,7 +305,7 @@ public incoming_message()
 
     if (strlen(sJsonError) > 0)
     {
-        server_print("[MatterAMXX] Invalid message arrived, ignoring.");
+        server_print("[MatterAMXX] %L", LANG_SERVER, "MATTERAMXX_INVALID");
         set_task(g_fQueryDelay, "connect_api");
         return;
     }
@@ -303,7 +314,7 @@ public incoming_message()
     {
         new sErrorMessage[INCOMING_BUFFER_LENGTH];
         grip_json_object_get_string(gJson, "message", sErrorMessage, charsmax(sErrorMessage));
-        server_print("[MatterAMXX] Error: %s.", sErrorMessage);
+        server_print("[MatterAMXX] %L", LANG_SERVER, "MATTERAMXX_ERROR", sErrorMessage);
         grip_destroy_json_value(gJson);
         set_fail_state(sErrorMessage);
         return;
@@ -311,13 +322,21 @@ public incoming_message()
 
     for(new x = 0; x < grip_json_array_get_count(gJson); x++)
     {
-        new sMessageBody[MESSAGE_LENGTH], sUsername[MAX_NAME_LENGTH], sOutputMessage[MESSAGE_LENGTH];
+        new sMessageBody[MESSAGE_LENGTH], sUsername[MAX_NAME_LENGTH];
         new GripJSONValue:jCurrentMessage = grip_json_array_get_value(gJson, x);
         grip_json_object_get_string(jCurrentMessage, "text", sMessageBody, charsmax(sMessageBody));
         grip_json_object_get_string(jCurrentMessage, "username", sUsername, charsmax(sUsername));
 
-        formatex(sOutputMessage, charsmax(sOutputMessage), (cstrike_running()) ? "^4%s^1: %s" : "%s: %s", sUsername, sMessageBody);
-        print_message(sOutputMessage);
+        new sProtocol[MAX_NAME_LENGTH], sTemp[MAX_NAME_LENGTH];
+        switch(get_pcvar_num(g_cvarIncoming_Chat_DisplayProtocol))
+        {
+            case 1:
+                grip_json_object_get_string(jCurrentMessage, "protocol", sTemp, charsmax(sTemp));
+            case 2:
+                grip_json_object_get_string(jCurrentMessage, "label", sTemp, charsmax(sTemp));
+        }
+        copy(sProtocol, charsmax(sProtocol), sTemp);
+        print_message(sMessageBody, sUsername, sProtocol);
         grip_destroy_json_value(jCurrentMessage);
     }
 
@@ -326,25 +345,30 @@ public incoming_message()
     set_task(g_fQueryDelay, "connect_api");
 }
 
-public print_message(const sMessage[])
+public print_message(const sMessage[], sUsername[MAX_NAME_LENGTH], sProtocol[MAX_NAME_LENGTH])
 {
     new iReturnVal = 0;
     new sMessageNew[MESSAGE_LENGTH];
-    copy(sMessageNew, MESSAGE_LENGTH, sMessage);
-    ExecuteForward(g_iPrintMessageForward, iReturnVal, sMessageNew);
+    //copy(sMessageNew, MESSAGE_LENGTH, sMessage);
+    ExecuteForward(g_iPrintMessageForward, iReturnVal, sMessage, sUsername, sProtocol);
     switch(iReturnVal)
     {
         case 0:
         {
-            server_print(sMessage);
+            if(strlen(sUsername) == 0)
+                copy(sUsername, charsmax(sUsername), g_sSystemName);
+            if(strlen(sProtocol) == 0)
+                copy(sProtocol, charsmax(sProtocol), g_sGamename);
+            formatex(sMessageNew, charsmax(sMessageNew), (cstrike_running()) ? "^4(%s) %s^1: %s" : "(%s) %s: %s", sProtocol, sUsername, sMessage);
+            server_print(sMessageNew);
             if(cstrike_running())
-                client_print_color(0, print_team_red, sMessage);
+                client_print_color(0, print_team_red, sMessageNew);
             else
-                client_print(0, print_chat, sMessage);
+                client_print(0, print_chat, sMessageNew);
         }
         case 1:
         {
-            server_print("A plugin prevented the incoming message: %s", sMessageNew);
+            server_print("[MatterAMXX] %L", LANG_SERVER, "MATTERAMXX_API_SUPERCEDED", sMessage);
         }
     }  
 }
@@ -355,6 +379,9 @@ public say_message(id)
     read_args(sMessage, charsmax(sMessage));
 
     replace_all(sMessage, charsmax(sMessage), "^"", "");
+
+    if(get_pcvar_bool(g_cvarOutgoing_Chat_ZeroifyAtSign))
+        replace_all(sMessage, charsmax(sMessage), "@", "@​");
 
     if(g_iPluginFlags & AMX_FLAG_DEBUG)
         server_print("[MatterAMXX Debug] Message ^"%s^" was sent.", sMessage);
@@ -449,10 +476,15 @@ public player_killed_ev()
     new idattacker = read_data(1);
     new id = read_data(2);
 
-    player_killed(id, idattacker, 0);
+    player_killed(id, idattacker);
 }
 
-public player_killed(id, idattacker, shouldgib)
+public player_killed_tfc(id, idinflictor, idattacker)
+{
+    player_killed(id, idattacker);
+}
+
+public player_killed(id, idattacker)
 {
     new sUserName[MAX_NAME_LENGTH], sAttackerName[MAX_NAME_LENGTH], sMessage[MESSAGE_LENGTH];
     
@@ -491,10 +523,8 @@ public send_message_custom(const sMessage[], const sUsername[], const sAvatar[])
     new GripJSONValue:gJson = grip_json_init_object();
 
     grip_json_object_set_string(gJson, "text", sMessage);
-    if(strlen(sUsername) > 0)
-        grip_json_object_set_string(gJson, "username", sUsername);
-    if(strlen(sAvatar) > 0)
-        grip_json_object_set_string(gJson, "avatar", sAvatar);
+    grip_json_object_set_string(gJson, "username", strlen(sUsername) > 0 ? sUsername : g_sSystemName);
+    grip_json_object_set_string(gJson, "avatar", strlen(sAvatar) > 0 ? sAvatar : g_sSystemAvatarUrl);
 
     send_message_rest(gJson);
 }
@@ -515,11 +545,16 @@ public send_message_rest(GripJSONValue:gJson)
 public outgoing_message()
 {
     if(g_iPluginFlags & AMX_FLAG_DEBUG)
-        server_print("[MatterAMXX Debug] I sent the message.");
+    {
+        server_print("[MatterAMXX Debug] I sent the message. Response State is %d", grip_get_response_state());
+        new sResponse[INCOMING_BUFFER_LENGTH];
+        grip_get_response_body_string(sResponse, charsmax(sResponse));
+        server_print("[MatterAMXX Debug] Server said: %s", sResponse);
+    }
 
     if(grip_get_response_state() != GripResponseStateSuccessful)
     {
-        server_print("[MatterAMXX] Message failed to sent to the bridge."); //why?
+        server_print("[MatterAMXX] %L", LANG_SERVER, "MATTERAMXX_MSG_FAILED"); //why?
         if(g_iPluginFlags & AMX_FLAG_DEBUG)
         {
             new sIncomingMessage[MESSAGE_LENGTH];

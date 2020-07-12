@@ -1,0 +1,5 @@
+[en]
+MATTERAMXX_PLUGIN_LAG_STATS = Server is running at %dCPU and %dFPS.
+
+[es]
+MATTERAMXX_PLUGIN_LAG_STATS = El servidor está corriendo a %i de CPU y a %iFPS.

@@ -17,14 +17,14 @@ enum {
 /**
  * Called when we get a message coming from Matterbridge
  * 
- * This forward has 3 possible return values:
+ * This forward has 2 possible return values:
  * · MATTER_IGNORE ignores the forward and posts the message as it is.
  * · MATTER_SUPERCEDE prevents the message from sending.
  *
  * @param	    message[] - Message coming from Matterbridge.
  *
  */
-forward matteramxx_print_message(message[MESSAGE_LENGTH]);
+forward matteramxx_print_message(message[MESSAGE_LENGTH], username[MAX_NAME_LENGTH], protocol[MAX_NAME_LENGTH]);
 
 /**
  * Method to send a message to the configured Matterbridge instance.

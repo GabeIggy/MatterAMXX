@@ -1,0 +1,31 @@
+[en]
+MATTERAMXX_RETRYING = Retrying in %d seconds...
+MATTERAMXX_CONN_FAILED = Connection failed.
+MATTERAMXX_MSG_FAILED = Message failed to sent to the bridge.
+MATTERAMXX_INVALID = Invalid message arrived, ignoring.
+MATTERAMXX_ERROR = An error has occured: %s.
+MATTERAMXX_API_SUPERCEDED = A plugin prevented the incoming message: %s
+MATTERAMXX_PLUGIN_LAG_STATS = Server is running at %d%%CPU and %dFPS.
+MATTERAMXX_PLUGIN_LAG_STFU = Server is not lagging. Check your computer and internet connection.
+MATTERAMXX_PLUGIN_LAG_NOTIF = The server can't keep up.
+MATTERAMXX_PLUGIN_LAG_RESTART_SCHEDULE = The server scheduled a restart after the map ends.
+MATTERAMXX_PLUGIN_RCON_UNAUTHORIZED = You don't have access to this command.
+MATTERAMXX_PLUGIN_RCON_DENIED = This command will not be executed.
+MATTERAMXX_PLUGIN_RCON_HAL = I'm sorry, %s. I'm afraid I can't do that.
+MATTERAMXX_PLUGIN_RCON_NO_OUTPUT = For security, the command will be executed but no output will be shown.
+
+[es]
+MATTERAMXX_RETRYING = Reintentando en %d segundos...
+MATTERAMXX_CONN_FAILED = La conexión ha fallado.
+MATTERAMXX_MSG_FAILED = El mensaje no se ha podido enviar al puente.
+MATTERAMXX_INVALID = Llegó un mensaje no valido, ignorando.
+MATTERAMXX_ERROR = Un error ha ocurrido: %s.
+MATTERAMXX_API_SUPERCEDED = Un plugin evitó que el siguiente mensaje se enviara: %s
+MATTERAMXX_PLUGIN_LAG_STATS = El servidor está corriendo a %i%% de CPU y a %iFPS.
+MATTERAMXX_PLUGIN_LAG_STFU = El servidor no está lag. Revisa tu sistema y conexión a internet.
+MATTERAMXX_PLUGIN_LAG_NOTIF = El servidor no puede soportar la carga.
+MATTERAMXX_PLUGIN_LAG_RESTART_SCHEDULE = El servidor se reiniciará después de este mapa.
+MATTERAMXX_PLUGIN_RCON_UNAUTHORIZED = No tienes acceso a este comando.
+MATTERAMXX_PLUGIN_RCON_DENIED = Este comando no será ejecutado.
+MATTERAMXX_PLUGIN_RCON_HAL = Lo siento, %s. Me temo que no puedo hacer eso.
+MATTERAMXX_PLUGIN_RCON_NO_OUTPUT = El comando se ejecutará pero no se mostrará una respuesta por seguridad.
