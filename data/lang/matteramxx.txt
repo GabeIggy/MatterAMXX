@@ -29,3 +29,35 @@ MATTERAMXX_PLUGIN_RCON_UNAUTHORIZED = No tienes acceso a este comando.
 MATTERAMXX_PLUGIN_RCON_DENIED = Este comando no será ejecutado.
 MATTERAMXX_PLUGIN_RCON_HAL = Lo siento, %s. Me temo que no puedo hacer eso.
 MATTERAMXX_PLUGIN_RCON_NO_OUTPUT = El comando se ejecutará pero no se mostrará una respuesta por seguridad.
+
+[ro]
+MATTERAMXX_RETRYING =  Incearca din nou in %d secunde...
+MATTERAMXX_CONN_FAILED = Conexiune esuata.
+MATTERAMXX_MSG_FAILED = Mesajul nu a putut fi trimis.
+MATTERAMXX_INVALID = Mesaj invalid.
+MATTERAMXX_ERROR = A aparut o eroare: %s.
+MATTERAMXX_API_SUPERCEDED = Un plugin a impiedicat trimiterea mesajului: %s
+MATTERAMXX_PLUGIN_LAG_STATS = Serverul ruleaza pe %d%%CPU si %dFPS.
+MATTERAMXX_PLUGIN_LAG_STFU = Serverul nu are lag. Verifica-ti conexiunea la internet si calculatorul.
+MATTERAMXX_PLUGIN_LAG_NOTIF = Serverul nu poate tine pasul.
+MATTERAMXX_PLUGIN_LAG_RESTART_SCHEDULE = Serverul e programat pentru restart dupa terminatarea hartii.
+MATTERAMXX_PLUGIN_RCON_UNAUTHORIZED = Nu ai acces la aceasta comanda.
+MATTERAMXX_PLUGIN_RCON_DENIED = Aceasta comanda nu a putut fi executata.
+MATTERAMXX_PLUGIN_RCON_HAL = Scuze, %s, dar nu pot face acest lucru.
+MATTERAMXX_PLUGIN_RCON_NO_OUTPUT = Din motive de securitate, comanda nu va fi afisata.
+
+[tr]
+MATTERAMXX_RETRYING = %d saniye icinde yeniden deneniyor...
+MATTERAMXX_CONN_FAILED = Baglanti basarisiz.
+MATTERAMXX_MSG_FAILED = Mesaj kopruye gonderilmede basarisiz.
+MATTERAMXX_INVALID = Gecersiz mesaja ulasildi, es geciliyor.
+MATTERAMXX_ERROR = Bir hata olustu: %s.
+MATTERAMXX_API_SUPERCEDED = Bir eklenti gelen mesaji onledi: %s
+MATTERAMXX_PLUGIN_LAG_STATS = Sunucu %d%%CPU ve %dFPS olarak calisiyor.
+MATTERAMXX_PLUGIN_LAG_STFU = Sunucu lagli degil. Bilgisayarini ve internet baglantini kontrol et.
+MATTERAMXX_PLUGIN_LAG_NOTIF = Sunucu devam edemiyor.
+MATTERAMXX_PLUGIN_LAG_RESTART_SCHEDULE = Sunucu harita bittikten sonra yeniden baslatmaya programladi.
+MATTERAMXX_PLUGIN_RCON_UNAUTHORIZED = Bu komuta erisiminiz yok.
+MATTERAMXX_PLUGIN_RCON_DENIED = Bu komut gerceklestirilmeyecek.
+MATTERAMXX_PLUGIN_RCON_HAL = Uzgunum, %s. Korkarim onu yapamam.
+MATTERAMXX_PLUGIN_RCON_NO_OUTPUT = Guvenlik icin, komut gerceklestirilecek ama hic cikti gosterilmeyecek.
