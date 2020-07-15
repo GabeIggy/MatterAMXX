@@ -61,3 +61,19 @@ MATTERAMXX_PLUGIN_RCON_UNAUTHORIZED = Bu komuta erisiminiz yok.
 MATTERAMXX_PLUGIN_RCON_DENIED = Bu komut gerceklestirilmeyecek.
 MATTERAMXX_PLUGIN_RCON_HAL = Uzgunum, %s. Korkarim onu yapamam.
 MATTERAMXX_PLUGIN_RCON_NO_OUTPUT = Guvenlik icin, komut gerceklestirilecek ama hic cikti gosterilmeyecek.
+
+[al]
+MATTERAMXX_RETRYING = Duke provuar në %s sekonda...
+MATTERAMXX_CONN_FAILED = Lidhja dështoi.
+MATTERAMXX_MSG_FAILED = Mesazhi dështoi që të dërgohet tek ura lidhëse.
+MATTERAMXX_INVALID = Një mesazh i pavlefshëm erdhi, do lihet anash.
+MATTERAMXX_ERROR = Një gabim ndodhi: %s.
+MATTERAMXX_API_SUPERCEDED = Një shtojcë parandaloi mesazhin që po vinte: %s
+MATTERAMXX_PLUGIN_LAG_STATS = Serveri po punon %d%%CPU dhe %dFPS.
+MATTERAMXX_PLUGIN_LAG_STFU = Serveri nuk po vonohet. Shikojeni pajisjen dhe rrjetin tuaj.
+MATTERAMXX_PLUGIN_LAG_NOTIF = Serveri nuk mund të vazhdoj.
+MATTERAMXX_PLUGIN_LAG_RESTART_SCHEDULE = Serveri caktoi një rifillim pas kësaj harte.
+MATTERAMXX_PLUGIN_RCON_UNAUTHORIZED = Ju nuk keni qasje për këtë komandë.
+MATTERAMXX_PLUGIN_RCON_DENIED = Kjo komandë nuk do zbatohet.
+MATTERAMXX_PLUGIN_RCON_HAL = Më falni, %s. Frigohem se nuk mundem ta bëj atë.
+MATTERAMXX_PLUGIN_RCON_NO_OUTPUT = Për siguri, komanda do të zbatohet por asnjë dalje(rezultat) nuk do tregohet.

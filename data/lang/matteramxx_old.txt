@@ -9,3 +9,6 @@ MATTERAMXX_PLUGIN_LAG_STATS = Serverul ruleaza pe %dCPU si %dFPS.
 
 [tr]
 MATTERAMXX_PLUGIN_LAG_STATS = Sunucu %dCPU ve %dFPS olarak calisiyor
+
+[al]
+MATTERAMXX_PLUGIN_LAG_STATS = Serveri po punon %dCPU dhe %dFPS.
