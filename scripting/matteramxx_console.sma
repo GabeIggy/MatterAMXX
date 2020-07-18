@@ -14,6 +14,9 @@
 
 #define IP_REGEX "((?:(?:25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])\.){2})((?:25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])\.(?:25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9]))"
 
+#define CVARQUERY_FORMAT "^"%s^" is ^"%s^"^n"
+#define STATS_FORMAT "CPU   In    Out   Uptime  Users   FPS    Players^n%s^n"
+
 #define MATTERAMXX_PLUGIN_NAME "MatterAMXX RCON"
 #define MATTERAMXX_PLUGIN_AUTHOR "Gabe Iggy"
 #define MATTERAMXX_PLUGIN_VERSION "1.4rc"
@@ -63,6 +66,7 @@ public plugin_init()
     g_cvarHideCvars = register_cvar("amx_matter_rcon_hide_cvars", "1");
     g_cvarHideIPs = register_cvar("amx_matter_rcon_hide_ips", "1");
 
+    register_dictionary("admincmd.txt");
     register_dictionary("matteramxx.txt");
 
     register_cvar("amx_matter_rcon_bridge_version", MATTERAMXX_PLUGIN_VERSION, FCVAR_SERVER);
@@ -72,10 +76,10 @@ public plugin_cfg()
 {
     if(get_pcvar_num(g_cvarEnabled))
     {
+        g_iPluginFlags = plugin_flags();
+        
         if(g_iPluginFlags & AMX_FLAG_DEBUG)
             server_print("[MatterAMXX RCON Debug] Plugin is enabled.");
-
-        g_iPluginFlags = plugin_flags();
 
         if(get_pcvar_bool(g_cvarDontIgnoreObeyTo))
         {
@@ -102,9 +106,7 @@ public plugin_cfg()
             new x = 0;
             formatex(sFilename, charsmax(sFilename), "cvarlist0%d.txt", x);
             while(!file_exists(sFilename) && x <= CVARLIST_TRIES)
-            {
                 formatex(sFilename, charsmax(sFilename), "cvarlist0%d.txt", ++x);
-            }
             read_cvars(sFilename);
             unlink(sFilename);
         }
@@ -217,22 +219,12 @@ public matteramxx_print_message(message[MESSAGE_LENGTH], username[MAX_NAME_LENGT
                 server_print("[MatterAMXX RCON Debug] I'm setting the hook and executing %s on the game console.", message);
 
             if(containi(message,";") != -1) //command injection
-            {
-                formatex(g_sResponseMessage, charsmax(g_sResponseMessage), "* %L", LANG_SERVER, "MATTERAMXX_PLUGIN_RCON_NO_OUTPUT");
-                matteramxx_send_message(g_sResponseMessage);
-                server_cmd(message);
-                return MATTER_SUPERCEDE;
-            }
+                return reject_command(message);
 
             for(new i; i < sizeof g_sDangerousCommands; i++)
             {
-                if(containi(message,g_sDangerousCommands[i]) == 0)
-                {
-                    formatex(g_sResponseMessage, charsmax(g_sResponseMessage), "* %L", LANG_SERVER, "MATTERAMXX_PLUGIN_RCON_NO_OUTPUT");
-                    matteramxx_send_message(g_sResponseMessage);
-                    server_cmd(message);
-                    return MATTER_SUPERCEDE;
-                }
+                if(containi(message, g_sDangerousCommands[i]) == 0)
+                    return reject_command(message);
             }
 
             g_iHandlePrintf = OrpheuRegisterHook(OrpheuGetFunction("Con_Printf"), "rcon_response");
@@ -261,14 +253,36 @@ public matteramxx_print_message(message[MESSAGE_LENGTH], username[MAX_NAME_LENGT
     return MATTER_IGNORE;
 }
 
-public OrpheuHookReturn:rcon_response(const a[], const message[])
+public reject_command(const message[])
 {
-    OrpheuUnregisterHook(g_iHandlePrintf); //we need to unhook on each print to avoid a severe hook loop on error or debug
+    formatex(g_sResponseMessage, charsmax(g_sResponseMessage), "* %L", LANG_SERVER, "MATTERAMXX_PLUGIN_RCON_NO_OUTPUT");
+    matteramxx_send_message(g_sResponseMessage);
+    server_cmd(message);
+    return MATTER_SUPERCEDE;
+}
 
-    if(g_iPluginFlags & AMX_FLAG_DEBUG)
-        server_print("[MatterAMXX RCON Debug] Printed line is %s", message);
 
-    add(g_sResponseMessage, charsmax(g_sResponseMessage), message);
+public OrpheuHookReturn:rcon_response(const format[], const message[])
+{
+    // we need to unhook on each print to avoid a severe hook loop on error or debug
+    OrpheuUnregisterHook(g_iHandlePrintf);
+
+    // orpheu/pawn doesn't support variadic values so we have to improvise
+    if(equal(CVARQUERY_FORMAT, format))
+    {
+        new cvarValue[64], message2[128];
+        get_cvar_string(message, cvarValue, charsmax(cvarValue));
+        formatex(message2, charsmax(message2), format, message, cvarValue);
+        add(g_sResponseMessage, charsmax(g_sResponseMessage), message2);
+    }
+    else if(equal(STATS_FORMAT, format))
+    {
+        new message2[512];
+        formatex(message2, charsmax(message2), format, message);
+        add(g_sResponseMessage, charsmax(g_sResponseMessage), message2);
+    }
+    else
+        add(g_sResponseMessage, charsmax(g_sResponseMessage), message);
 
     g_iHandlePrintf = OrpheuRegisterHook(OrpheuGetFunction("Con_Printf"), "rcon_response");
     return OrpheuSupercede;
@@ -282,10 +296,14 @@ public hide_protected(string[], size)
         ArrayGetString(g_iProtectedCvars, x, sCvar, charsmax(sCvar));
         if(containi(string, sCvar) > -1)
         {
-            //cvar found, that means the value should (not always) be output
+            // cvar found, that means the value should (not always) be output
             new sCvarValue[128]; 
             if(get_pcvar_string(get_cvar_pointer(sCvar), sCvarValue, charsmax(sCvarValue)) > 0)
-                replace_all(string, size, sCvarValue, "\*\*\* PROTECTED \*\*\*");
+            {
+                new sProtected[32];
+                formatex(sProtected, charsmax(sProtected), "\*\*\* %L \*\*\*", LANG_SERVER, "PROTECTED");
+                replace_all(string, size, sCvarValue, sProtected);
+            }
         }
     }
 }
