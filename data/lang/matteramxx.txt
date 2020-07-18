@@ -77,3 +77,19 @@ MATTERAMXX_PLUGIN_RCON_UNAUTHORIZED = Ju nuk keni qasje për këtë komandë.
 MATTERAMXX_PLUGIN_RCON_DENIED = Kjo komandë nuk do zbatohet.
 MATTERAMXX_PLUGIN_RCON_HAL = Më falni, %s. Frigohem se nuk mundem ta bëj atë.
 MATTERAMXX_PLUGIN_RCON_NO_OUTPUT = Për siguri, komanda do të zbatohet por asnjë dalje(rezultat) nuk do tregohet.
+
+[ru]
+MATTERAMXX_RETRYING = Повторная попытка через %d секунд ...
+MATTERAMXX_CONN_FAILED = Ошибка подключения.
+MATTERAMXX_MSG_FAILED = Сообщение не удалось отправить на мост.
+MATTERAMXX_INVALID = Получено неверное сообщение, игнорируется.
+MATTERAMXX_ERROR = Произошла ошибка: %s.
+MATTERAMXX_API_SUPERCEDED = Плагин предотвращает входящее сообщение: %s
+MATTERAMXX_PLUGIN_LAG_STATS = Сервер работает на %d%%ЦП и %dFPS.
+MATTERAMXX_PLUGIN_LAG_STFU = Сервер не отстает. Проверьте свой компьютер и подключение к интернету.
+MATTERAMXX_PLUGIN_LAG_NOTIF = Сервер не может идти в ногу.
+MATTERAMXX_PLUGIN_LAG_RESTART_SCHEDULE = Сервер запланировал перезапуск после окончания карты.
+MATTERAMXX_PLUGIN_RCON_UNAUTHORIZED = У вас нет доступа к этой команде.
+MATTERAMXX_PLUGIN_RCON_DENIED = Эта команда не будет выполнена.
+MATTERAMXX_PLUGIN_RCON_HAL = Извините, %s. Боюсь, я не могу этого сделать.
+MATTERAMXX_PLUGIN_RCON_NO_OUTPUT = В целях безопасности команда будет выполнена, но выходные данные не будут показаны.
