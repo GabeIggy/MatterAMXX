@@ -248,6 +248,8 @@ public plugin_cfg()
 
         g_iPluginFlags = plugin_flags();
     }
+    else
+        pause("ad");
 }
 
 public plugin_end()
