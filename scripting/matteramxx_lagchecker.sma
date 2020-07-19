@@ -8,6 +8,7 @@
 
 #pragma semicolon 1
 
+new g_cvarEnabled;
 new g_cvarCpuThreshold;
 new g_cvarFpsThreshold;
 new g_cvarToPing;
@@ -23,12 +24,34 @@ public plugin_init()
     register_clcmd("say", "say_message");
     register_clcmd("say_team", "say_message");
 
-    g_iPluginFlags = plugin_flags();
-    g_cvarToPing = register_cvar("amx_lagchecker_ping_this_person", "");
-    g_cvarCpuThreshold = register_cvar("amx_lagchecker_cpu_threshold", "75");
-    g_cvarFpsThreshold = register_cvar("amx_lagchecker_fps_threshold", "30");
+    g_cvarEnabled = register_cvar("amx_matter_lagchecker_enabled", "1");
+    g_cvarToPing = register_cvar("amx_matter_lagchecker_ping_this_person", "");
+    g_cvarCpuThreshold = register_cvar("amx_matter_lagchecker_cpu_threshold", "75");
+    g_cvarFpsThreshold = register_cvar("amx_matter_lagchecker_fps_threshold", "30");
 
     register_dictionary("matteramxx.txt");
+}
+
+public plugin_cfg()
+{
+    if(get_pcvar_num(g_cvarEnabled))
+    {
+        new iMasterPluginIndex = is_plugin_loaded("MatterAMXX");
+        if(iMasterPluginIndex > -1)
+        {
+            g_iPluginFlags = plugin_flags();
+            
+            if(g_iPluginFlags & AMX_FLAG_DEBUG)
+            {
+                server_print("[MatterAMXX Lag Checker Debug] Plugin is enabled.");
+                server_print("[MatterAMXX Lag Checker Debug] Finished plugin_cfg()");
+            }
+        }
+        else
+            set_fail_state("This plugin requires MatterAMXX to be loaded.");
+    }
+    else
+        pause("ad");
 }
 
 public say_message(id)

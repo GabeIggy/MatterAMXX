@@ -62,7 +62,7 @@ public plugin_init()
 
     g_cvarEnabled = register_cvar("amx_matter_rcon_enable", "1");
     g_cvarDontIgnoreObeyTo = register_cvar("amx_matter_rcon_dont_ignore_list", "1"); //DANGEROUS!!
-    g_cvarPrefix = register_cvar("amx_matter_rcon_prefix", "!rcon");
+    g_cvarPrefix = register_cvar("amx_matter_rcon_prefix", "!rcon ");
     g_cvarHideCvars = register_cvar("amx_matter_rcon_hide_cvars", "1");
     g_cvarHideIPs = register_cvar("amx_matter_rcon_hide_ips", "1");
 
@@ -76,49 +76,57 @@ public plugin_cfg()
 {
     if(get_pcvar_num(g_cvarEnabled))
     {
-        g_iPluginFlags = plugin_flags();
-        
-        if(g_iPluginFlags & AMX_FLAG_DEBUG)
-            server_print("[MatterAMXX RCON Debug] Plugin is enabled.");
-
-        if(get_pcvar_bool(g_cvarDontIgnoreObeyTo))
+        new iMasterPluginIndex = is_plugin_loaded("MatterAMXX");
+        if(iMasterPluginIndex > -1)
         {
-            g_iTrieObeyTo = TrieCreate();
-
-            new sFilename[128];
-            new sConfigDir[64];
-            get_configsdir(sConfigDir, charsmax(sConfigDir));
-            formatex(sFilename, charsmax(sFilename), "%s/%s", sConfigDir, MATTERAMXX_CONSOLE_OBEY_FILE);
-            if(!load_masters(sFilename))
-                set_fail_state("Unable to open Master Accounts file.");
-        }
-
-        if(get_pcvar_bool(g_cvarHideCvars))
-        {
-            g_iProtectedCvars = ArrayCreate(64);
+            g_iPluginFlags = plugin_flags();
+            
             if(g_iPluginFlags & AMX_FLAG_DEBUG)
-                server_print("[MatterAMXX RCON Debug] Creating array with size %d.", ArraySize(g_iProtectedCvars));
-            server_cmd("cvarlist log");
-            server_exec();
+                server_print("[MatterAMXX RCON Debug] Plugin is enabled.");
 
-            // some games, like ricochet, start from cvarlist01.txt instead of cvarlist00.txt, we need to retry until we get the correct file
-            new sFilename[16];
-            new x = 0;
-            formatex(sFilename, charsmax(sFilename), "cvarlist0%d.txt", x);
-            while(!file_exists(sFilename) && x <= CVARLIST_TRIES)
-                formatex(sFilename, charsmax(sFilename), "cvarlist0%d.txt", ++x);
-            read_cvars(sFilename);
-            unlink(sFilename);
+            if(get_pcvar_bool(g_cvarDontIgnoreObeyTo))
+            {
+                g_iTrieObeyTo = TrieCreate();
+
+                new sFilename[128];
+                new sConfigDir[64];
+                get_configsdir(sConfigDir, charsmax(sConfigDir));
+                formatex(sFilename, charsmax(sFilename), "%s/%s", sConfigDir, MATTERAMXX_CONSOLE_OBEY_FILE);
+                if(!load_masters(sFilename))
+                    set_fail_state("Unable to open Master Accounts file.");
+            }
+
+            if(get_pcvar_bool(g_cvarHideCvars))
+            {
+                g_iProtectedCvars = ArrayCreate(64);
+                if(g_iPluginFlags & AMX_FLAG_DEBUG)
+                    server_print("[MatterAMXX RCON Debug] Creating array with size %d.", ArraySize(g_iProtectedCvars));
+                server_cmd("cvarlist log");
+                server_exec();
+
+                // some games, like ricochet, start from cvarlist01.txt instead of cvarlist00.txt, we need to retry until we get the correct file
+                new sFilename[16];
+                new x = 0;
+                formatex(sFilename, charsmax(sFilename), "cvarlist0%d.txt", x);
+                while(!file_exists(sFilename) && x <= CVARLIST_TRIES)
+                    formatex(sFilename, charsmax(sFilename), "cvarlist0%d.txt", ++x);
+                read_cvars(sFilename);
+                unlink(sFilename);
+            }
+
+            if(get_pcvar_bool(g_cvarHideIPs))
+            {
+                g_rPattern = regex_compile_ex(IP_REGEX);
+            }
+
+            if(g_iPluginFlags & AMX_FLAG_DEBUG)
+                server_print("[MatterAMXX RCON Debug] Finished plugin_cfg()");
         }
-
-        if(get_pcvar_bool(g_cvarHideIPs))
-        {
-            g_rPattern = regex_compile_ex(IP_REGEX);
-        }
-
-        if(g_iPluginFlags & AMX_FLAG_DEBUG)
-            server_print("[MatterAMXX RCON Debug] Finished plugin_cfg()");
+        else
+            set_fail_state("This plugin requires MatterAMXX to be loaded.");
     }
+    else
+        pause("ad");
 }
 
 public plugin_end()
