@@ -30,6 +30,7 @@ new g_cvarDontIgnoreObeyTo;
 new g_cvarPrefix;
 new g_cvarHideCvars;
 new g_cvarHideIPs;
+new g_cvarCodeBlock;
 
 new g_sResponseMessage[SERVER_RESPONSE_LENGTH];
 new g_iProtectedArraySize = 0;
@@ -54,6 +55,7 @@ new const g_sDangerousCommands[][] = {
         "restart",      //server crashes
         "quit",         //server crashes
         "map",          //server crashes
+        "version"       //server crashes
     };
 
 public plugin_init()
@@ -65,6 +67,7 @@ public plugin_init()
     g_cvarPrefix = register_cvar("amx_matter_rcon_prefix", "!rcon ");
     g_cvarHideCvars = register_cvar("amx_matter_rcon_hide_cvars", "1");
     g_cvarHideIPs = register_cvar("amx_matter_rcon_hide_ips", "1");
+    g_cvarCodeBlock = register_cvar("amx_matter_rcon_code_block", "1");
 
     register_dictionary("admincmd.txt");
     register_dictionary("matteramxx.txt");
@@ -141,7 +144,7 @@ public bool:load_masters(const filePath[])
     if(g_iPluginFlags & AMX_FLAG_DEBUG)
         server_print("[MatterAMXX RCON Debug] Trying to read file %s", filePath);
     static file, sUsername[32], sProtocol[32], line[100], iCnt;
-    if ((file = fopen(filePath, "r")))
+    if((file = fopen(filePath, "r")))
     {
         iCnt = 0;
         while (!feof(file))
@@ -164,8 +167,10 @@ public bool:load_masters(const filePath[])
         return true;
     }
     else 
+    {
         log_amx("[MatterAMXX RCON] Can't open master accounts file.");
-    return false;
+        return false;
+    }
 }
 
 public bool:read_cvars(const filePath[])
@@ -173,7 +178,7 @@ public bool:read_cvars(const filePath[])
     if(g_iPluginFlags & AMX_FLAG_DEBUG)
         server_print("[MatterAMXX RCON Debug] Trying to read file %s", filePath);
     static file, line[100];
-    if ((file = fopen(filePath, "r")))
+    if((file = fopen(filePath, "r")))
     {
         while (!feof(file))
         {
@@ -199,8 +204,10 @@ public bool:read_cvars(const filePath[])
         return true;
     }
     else 
+    {
         log_amx("[MatterAMXX RCON] Can't open cvarlist file.");
-    return false;
+        return false;
+    }
 }
 
 public matteramxx_print_message(message[MESSAGE_LENGTH], username[MAX_NAME_LENGTH], protocol[MAX_NAME_LENGTH])
@@ -213,7 +220,7 @@ public matteramxx_print_message(message[MESSAGE_LENGTH], username[MAX_NAME_LENGT
         server_print("[MatterAMXX RCON Debug] Comparing if it has the prefix %s", sPrefix);
     if(equal(message, sPrefix, get_pcvar_string(g_cvarPrefix, sPrefix, charsmax(sPrefix))))
     {
-        g_sResponseMessage = "";
+        g_sResponseMessage = get_pcvar_bool(g_cvarCodeBlock) ? "```" : "";
         if(g_iPluginFlags & AMX_FLAG_DEBUG)
             server_print("[MatterAMXX RCON Debug] It is a valid prefix, checking if user is authorized.");
 
@@ -246,7 +253,11 @@ public matteramxx_print_message(message[MESSAGE_LENGTH], username[MAX_NAME_LENGT
             if(get_pcvar_bool(g_cvarHideIPs))
                 regex_replace(g_rPattern, g_sResponseMessage, charsmax(g_sResponseMessage), "$1XXX.XXX");
 
-            replace_all(g_sResponseMessage, charsmax(g_sResponseMessage), "^"", "\^"");
+            if(get_pcvar_bool(g_cvarCodeBlock))
+                add(g_sResponseMessage, charsmax(g_sResponseMessage), "```");
+            else
+                replace_all(g_sResponseMessage, charsmax(g_sResponseMessage), "^"", "\^"");
+                
             matteramxx_send_message(g_sResponseMessage);
         }
         else
