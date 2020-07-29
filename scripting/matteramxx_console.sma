@@ -19,7 +19,7 @@
 
 #define MATTERAMXX_PLUGIN_NAME "MatterAMXX RCON"
 #define MATTERAMXX_PLUGIN_AUTHOR "Gabe Iggy"
-#define MATTERAMXX_PLUGIN_VERSION "1.4rc"
+#define MATTERAMXX_PLUGIN_VERSION "1.4"
 
 #pragma semicolon 1
 

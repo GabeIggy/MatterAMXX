@@ -4,7 +4,7 @@
 
 #define MATTERAMXX_PLUGIN_PLUGIN "MatterAMXX Lag Checker"
 #define MATTERAMXX_PLUGIN_AUTHOR "Gabe Iggy"
-#define MATTERAMXX_PLUGIN_VERSION "1.4rc"
+#define MATTERAMXX_PLUGIN_VERSION "1.4"
 
 #pragma semicolon 1
 
