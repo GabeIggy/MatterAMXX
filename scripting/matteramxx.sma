@@ -53,6 +53,8 @@
 
 #define REGEX_STEAMID_PATTERN "^^STEAM_(0|1):(0|1):\d+$"
 
+#define SYSMES_ID "0xDEADBEEF"
+
 #define MATTERAMXX_PLUGIN_NAME "MatterAMXX"
 #define MATTERAMXX_PLUGIN_AUTHOR "Gabe Iggy"
 #define MATTERAMXX_PLUGIN_VERSION "1.5"
@@ -238,7 +240,7 @@ public plugin_cfg()
                     new sMapName[32], sMessage[MESSAGE_LENGTH];
                     get_mapname(sMapName, charsmax(sMapName));
                     formatex(sMessage, charsmax(sMessage), "* Map changed to %s", sMapName);
-                    send_message_custom(sMessage, g_sSystemName, g_sSystemAvatarUrl);
+                    send_message_custom(sMessage, g_sSystemName, g_sSystemAvatarUrl, true);
                 }
                 g_bJoinDelayDone = true;
             }
@@ -292,7 +294,7 @@ public join_delay_done()
         new sMapName[32], sMessage[MESSAGE_LENGTH];
         get_mapname(sMapName, charsmax(sMapName));
         formatex(sMessage, charsmax(sMessage), "* Map changed to %s", sMapName);
-        send_message_custom(sMessage, g_sSystemName, g_sSystemAvatarUrl);
+        send_message_custom(sMessage, g_sSystemName, g_sSystemAvatarUrl, true);
     }
 }
 
@@ -349,6 +351,12 @@ public incoming_message()
     {
         new sMessageBody[MESSAGE_LENGTH], sUsername[MAX_NAME_LENGTH], sProtocol[MAX_NAME_LENGTH], sMessageEvent[32];
         new GripJSONValue:jCurrentMessage = grip_json_array_get_value(gJson, x);
+        grip_json_object_get_string(jCurrentMessage, "userid", sMessageEvent, charsmax(sMessageEvent));
+        if(equal(sMessageEvent, SYSMES_ID))
+        {
+            server_print("[MatterAMXX] %L", LANG_SERVER, "MATTERAMXX_SYSMSG_NOT_SENT");
+            return;
+        }
         grip_json_object_get_string(jCurrentMessage, "text", sMessageBody, charsmax(sMessageBody));
         grip_json_object_get_string(jCurrentMessage, "username", sUsername, charsmax(sUsername));
         grip_json_object_get_string(jCurrentMessage, "protocol", sProtocol, charsmax(sProtocol));
@@ -532,17 +540,19 @@ public player_killed(id, idattacker)
     grip_json_object_set_string(gJson, "username", g_sSystemName);
     if(strlen(g_sSystemAvatarUrl) > 0)
         grip_json_object_set_string(gJson, "avatar", g_sSystemAvatarUrl);
+    grip_json_object_set_string(gJson, "userid", SYSMES_ID);
 
     send_message_rest(gJson);
 }
 
-public send_message_custom(const sMessage[], const sUsername[], const sAvatar[])
+public send_message_custom(const sMessage[], const sUsername[], const sAvatar[], const bool:is_system)
 {
     new GripJSONValue:gJson = grip_json_init_object();
 
     grip_json_object_set_string(gJson, "text", sMessage);
     grip_json_object_set_string(gJson, "username", strlen(sUsername) > 0 ? sUsername : g_sSystemName);
     grip_json_object_set_string(gJson, "avatar", strlen(sAvatar) > 0 ? sAvatar : g_sSystemAvatarUrl);
+    grip_json_object_set_string(gJson, "userid", is_system ? SYSMES_ID : "");
 
     send_message_rest(gJson);
 }
@@ -617,6 +627,7 @@ public client_disconnected(id)
         grip_json_object_set_string(gJson, "username", g_sSystemName);
         if(strlen(g_sSystemAvatarUrl) > 0)
             grip_json_object_set_string(gJson, "avatar", g_sSystemAvatarUrl);
+        grip_json_object_set_string(gJson, "userid", SYSMES_ID);
 
         send_message_rest(gJson);
     }
@@ -648,6 +659,7 @@ public client_putinserver(id)
         grip_json_object_set_string(gJson, "username", g_sSystemName);
         if(strlen(g_sSystemAvatarUrl) > 0)
             grip_json_object_set_string(gJson, "avatar", g_sSystemAvatarUrl);
+        grip_json_object_set_string(gJson, "userid", SYSMES_ID);
 
         send_message_rest(gJson);
     }

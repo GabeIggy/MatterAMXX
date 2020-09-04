@@ -4,7 +4,7 @@
 
 #define MATTERAMXX_PLUGIN_PLUGIN "MatterAMXX Lag Checker"
 #define MATTERAMXX_PLUGIN_AUTHOR "Gabe Iggy"
-#define MATTERAMXX_PLUGIN_VERSION "1.4"
+#define MATTERAMXX_PLUGIN_VERSION "1.5"
 
 #pragma semicolon 1
 
@@ -114,7 +114,7 @@ public execute_lag()
         new s_toPing[MAX_NAME_LENGTH];
         get_pcvar_string(g_cvarToPing, s_toPing, charsmax(s_toPing));
         formatex(s_matterMessage, charsmax(s_matterMessage), "%s %L %L", s_toPing, LANG_SERVER, "MATTERAMXX_PLUGIN_LAG_STATS", floatround(cpu), floatround(fps), LANG_SERVER, "MATTERAMXX_PLUGIN_LAG_NOTIF");
-        matteramxx_send_message(s_matterMessage);
+        matteramxx_send_message(s_matterMessage, _, _, true);
         register_message(SVC_INTERMISSION, "map_end");
         g_bRestartScheduled = true;
     }
@@ -122,7 +122,7 @@ public execute_lag()
     {
         formatex(s_matterMessage, charsmax(s_matterMessage), "* %L", LANG_SERVER, "MATTERAMXX_PLUGIN_LAG_STATS", floatround(cpu), floatround(fps));
         client_print(0, print_chat, "* %L %L", LANG_PLAYER, "MATTERAMXX_PLUGIN_LAG_STATS", floatround(cpu), floatround(fps), LANG_PLAYER, "MATTERAMXX_PLUGIN_LAG_STFU");
-        matteramxx_send_message(s_matterMessage);
+        matteramxx_send_message(s_matterMessage, _, _, true);
     }
 }
 

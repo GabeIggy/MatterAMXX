@@ -3,6 +3,7 @@
 #define BASE_URL_LENGTH 256
 #define JSON_PARAMETER_LENGTH 256
 #define TOKEN_LENGTH 64
+#define SYSMES_ID "0xDEADBEEF"
 
 #if AMXX_VERSION_NUM < 183
     #define MAX_PLAYERS 32
@@ -32,15 +33,17 @@ forward matteramxx_print_message(message[MESSAGE_LENGTH], username[MAX_NAME_LENG
  * @param		message[] - Message you want to send
  * @param		username[] - Username that will appear in the protocols
  * @param		avatar[] - URL pointing to the avatar of this "user" (On protocols that support it)
+ * @param		is_system[] - If true, message won't be printed in other game servers
  *
  */
-stock matteramxx_send_message(const message[], const username[] = "", const avatar[] = "")
+stock matteramxx_send_message(const message[], const username[] = "", const avatar[] = "", bool:is_system = false)
 {
     if(callfunc_begin("send_message_custom","matteramxx.amxx") == 1) 
     {
         callfunc_push_str(message)
         callfunc_push_str(username)
         callfunc_push_str(avatar)
+        callfunc_push_int(is_system)
         callfunc_end()
     }
 }  

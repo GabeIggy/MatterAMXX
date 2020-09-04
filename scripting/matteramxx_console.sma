@@ -19,7 +19,7 @@
 
 #define MATTERAMXX_PLUGIN_NAME "MatterAMXX RCON"
 #define MATTERAMXX_PLUGIN_AUTHOR "Gabe Iggy"
-#define MATTERAMXX_PLUGIN_VERSION "1.4"
+#define MATTERAMXX_PLUGIN_VERSION "1.5"
 
 #pragma semicolon 1
 
@@ -118,9 +118,7 @@ public plugin_cfg()
             }
 
             if(get_pcvar_bool(g_cvarHideIPs))
-            {
                 g_rPattern = regex_compile_ex(IP_REGEX);
-            }
 
             if(g_iPluginFlags & AMX_FLAG_DEBUG)
                 server_print("[MatterAMXX RCON Debug] Finished plugin_cfg()");
@@ -258,14 +256,14 @@ public matteramxx_print_message(message[MESSAGE_LENGTH], username[MAX_NAME_LENGT
             else
                 replace_all(g_sResponseMessage, charsmax(g_sResponseMessage), "^"", "\^"");
                 
-            matteramxx_send_message(g_sResponseMessage);
+            matteramxx_send_message(g_sResponseMessage, _, _, true);
         }
         else
         {
             if(g_iPluginFlags & AMX_FLAG_DEBUG)
                 server_print("[MatterAMXX RCON Debug] %s (%s)'s command got rejected.", username, protocol);
             formatex(g_sResponseMessage, charsmax(g_sResponseMessage), "* %L", LANG_SERVER, "MATTERAMXX_PLUGIN_RCON_UNAUTHORIZED");
-            matteramxx_send_message(g_sResponseMessage);
+            matteramxx_send_message(g_sResponseMessage, _, _, true);
         }
         return MATTER_SUPERCEDE;
     }
@@ -275,7 +273,7 @@ public matteramxx_print_message(message[MESSAGE_LENGTH], username[MAX_NAME_LENGT
 public reject_command(const message[])
 {
     formatex(g_sResponseMessage, charsmax(g_sResponseMessage), "* %L", LANG_SERVER, "MATTERAMXX_PLUGIN_RCON_NO_OUTPUT");
-    matteramxx_send_message(g_sResponseMessage);
+    matteramxx_send_message(g_sResponseMessage, _, _, true);
     server_cmd(message);
     return MATTER_SUPERCEDE;
 }
