@@ -318,7 +318,7 @@ public hide_protected(string[], size)
             if(get_pcvar_string(get_cvar_pointer(sCvar), sCvarValue, charsmax(sCvarValue)) > 0)
             {
                 new sProtected[32];
-                formatex(sProtected, charsmax(sProtected), "\*\*\* %L \*\*\*", LANG_SERVER, "PROTECTED");
+                formatex(sProtected, charsmax(sProtected), get_pcvar_bool(g_cvarCodeBlock) ? "*** %L ***" : "\*\*\* %L \*\*\*", LANG_SERVER, "PROTECTED");
                 replace_all(string, size, sCvarValue, sProtected);
             }
         }
