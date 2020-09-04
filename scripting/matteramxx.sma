@@ -69,7 +69,6 @@ new g_cvarBridgePort;
 new g_cvarBridgeGateway;
 new g_cvarToken;
 new g_cvarIncoming;
-new g_cvarIncoming_Chat_DisplayProtocol;
 new g_cvarIncoming_Chat_RefreshTime;
 new g_cvarOutgoing;
 new g_cvarOutgoing_SystemUsername;
@@ -320,6 +319,7 @@ public incoming_message()
         server_print("[MatterAMXX] %L", LANG_SERVER, "MATTERAMXX_CONN_FAILED");
         retry_connection();
     }
+
     new sIncomingMessage[INCOMING_BUFFER_LENGTH], sJsonError[MESSAGE_LENGTH], GripJSONValue:gJson;
 
     grip_get_response_body_string(sIncomingMessage, charsmax(sIncomingMessage));
@@ -347,21 +347,14 @@ public incoming_message()
 
     for(new x = 0; x < grip_json_array_get_count(gJson); x++)
     {
-        new sMessageBody[MESSAGE_LENGTH], sUsername[MAX_NAME_LENGTH];
+        new sMessageBody[MESSAGE_LENGTH], sUsername[MAX_NAME_LENGTH], sProtocol[MAX_NAME_LENGTH], sMessageEvent[32];
         new GripJSONValue:jCurrentMessage = grip_json_array_get_value(gJson, x);
         grip_json_object_get_string(jCurrentMessage, "text", sMessageBody, charsmax(sMessageBody));
         grip_json_object_get_string(jCurrentMessage, "username", sUsername, charsmax(sUsername));
+        grip_json_object_get_string(jCurrentMessage, "protocol", sProtocol, charsmax(sProtocol));
 
-        new sProtocol[MAX_NAME_LENGTH], sTemp[MAX_NAME_LENGTH];
-        switch(get_pcvar_num(g_cvarIncoming_Chat_DisplayProtocol))
-        {
-            case 1:
-                grip_json_object_get_string(jCurrentMessage, "protocol", sTemp, charsmax(sTemp));
-            case 2:
-                grip_json_object_get_string(jCurrentMessage, "label", sTemp, charsmax(sTemp));
-        }
-        copy(sProtocol, charsmax(sProtocol), sTemp);
         print_message(sMessageBody, sUsername, sProtocol);
+
         grip_destroy_json_value(jCurrentMessage);
     }
 
