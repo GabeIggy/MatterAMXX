@@ -55,7 +55,7 @@
 
 #define MATTERAMXX_PLUGIN_NAME "MatterAMXX"
 #define MATTERAMXX_PLUGIN_AUTHOR "Gabe Iggy"
-#define MATTERAMXX_PLUGIN_VERSION "1.5"
+#define MATTERAMXX_PLUGIN_VERSION "1.4"
 
 #pragma semicolon 1
 
@@ -63,12 +63,11 @@ new g_cvarEnabled;
 new g_cvarSystemAvatarUrl;
 new g_cvarAutogenAvatarUrl;
 new g_cvarAvatarUrl;
-new g_cvarBridgeProtocol;
-new g_cvarBridgeHost;
-new g_cvarBridgePort;
+new g_cvarBridgeUrl;
 new g_cvarBridgeGateway;
 new g_cvarToken;
 new g_cvarIncoming;
+new g_cvarIncoming_Chat_DisplayProtocol;
 new g_cvarIncoming_Chat_RefreshTime;
 new g_cvarOutgoing;
 new g_cvarOutgoing_SystemUsername;
@@ -89,9 +88,6 @@ new GripRequestCancellation:g_gripIncomingHandle;
 new GripRequestCancellation:g_gripOutgoingHandle;
 new GripRequestOptions:g_gIncomingHeader;
 new GripRequestOptions:g_gOutgoingHeader;
-
-//deprecated cvars
-new g_cvarDeprecatedBridgeUrl;
 
 new g_sIncomingUri[BASE_URL_LENGTH];
 new g_sOutgoingUri[BASE_URL_LENGTH];
@@ -134,13 +130,11 @@ public plugin_init()
     g_cvarSystemAvatarUrl = register_cvar("amx_matter_system_avatar", "", FCVAR_PROTECTED);
     g_cvarAutogenAvatarUrl = register_cvar("amx_matter_autogenerate_avatar", "", FCVAR_PROTECTED); //https://robohash.org/%s.png?set=set4
     g_cvarAvatarUrl = register_cvar("amx_matter_player_avatar", "", FCVAR_PROTECTED); //http://localhost/avatars/get_avatar.php?steamid=%s
-    g_cvarBridgeProtocol = register_cvar("amx_matter_bridge_protocol", "http", FCVAR_PROTECTED);
-    g_cvarBridgeHost = register_cvar("amx_matter_bridge_host", "localhost", FCVAR_PROTECTED);
-    g_cvarBridgePort = register_cvar("amx_matter_bridge_port", "1337", FCVAR_PROTECTED);
-    g_cvarDeprecatedBridgeUrl = register_cvar("amx_matter_bridge_url", "", FCVAR_PROTECTED);
+    g_cvarBridgeUrl = register_cvar("amx_matter_bridge_url", "http://localhost:1337", FCVAR_PROTECTED);
     g_cvarBridgeGateway = register_cvar("amx_matter_bridge_gateway", g_sGamename, FCVAR_PROTECTED);
     g_cvarToken = register_cvar("amx_matter_bridge_token", "", FCVAR_PROTECTED);
     g_cvarIncoming = register_cvar("amx_matter_bridge_incoming", "1");
+    g_cvarIncoming_Chat_DisplayProtocol = register_cvar("amx_matter_bridge_incoming_chat_protocol", "0");
     g_cvarIncoming_Chat_RefreshTime = register_cvar("amx_matter_incoming_update_time", "3.0");
     g_cvarOutgoing = register_cvar("amx_matter_bridge_outgoing", "1");
     g_cvarOutgoing_SystemUsername = register_cvar("amx_matter_bridge_outgoing_system_username", sServername);
@@ -172,23 +166,7 @@ public plugin_cfg()
     if(get_pcvar_num(g_cvarEnabled))
     {
         new sToken[TOKEN_LENGTH];
-        get_pcvar_string(g_cvarDeprecatedBridgeUrl, g_sBridgeUrl, charsmax(g_sBridgeUrl));
-        if(strlen(g_sBridgeUrl) > 0)
-            server_print("[MatterAMXX Warning] amx_matter_bridge_url is deprecated. This will throw an error in future MatterBridge versions, please update your cvars.");
-        else
-        {
-            new sBridgeProtocol[16], sBridgeHost[64], sBridgePort[16];
-            get_pcvar_string(g_cvarBridgeProtocol, sBridgeProtocol, charsmax(sBridgeProtocol));
-            get_pcvar_string(g_cvarBridgeHost, sBridgeHost, charsmax(sBridgeHost));
-            get_pcvar_string(g_cvarBridgePort, sBridgePort, charsmax(sBridgePort));
-            formatex(g_sBridgeUrl, charsmax(g_sBridgeUrl), "%s://%s", g_cvarBridgeProtocol, g_cvarBridgeHost);
-            if(strlen(sBridgePort) > 0)
-            {
-                add(g_sBridgeUrl, charsmax(g_sBridgeUrl), ":");
-                add(g_sBridgeUrl, charsmax(g_sBridgeUrl), sBridgePort);
-            }
-        }
-
+        get_pcvar_string(g_cvarBridgeUrl, g_sBridgeUrl, charsmax(g_sBridgeUrl));
         get_pcvar_string(g_cvarToken, sToken, charsmax(sToken));
         if(get_pcvar_bool(g_cvarOutgoing))
         {
@@ -319,7 +297,6 @@ public incoming_message()
         server_print("[MatterAMXX] %L", LANG_SERVER, "MATTERAMXX_CONN_FAILED");
         retry_connection();
     }
-
     new sIncomingMessage[INCOMING_BUFFER_LENGTH], sJsonError[MESSAGE_LENGTH], GripJSONValue:gJson;
 
     grip_get_response_body_string(sIncomingMessage, charsmax(sIncomingMessage));
