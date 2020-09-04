@@ -4,6 +4,7 @@ MATTERAMXX_CONN_FAILED = Connection failed.
 MATTERAMXX_MSG_FAILED = Message failed to sent to the bridge.
 MATTERAMXX_INVALID = Invalid message arrived, ignoring.
 MATTERAMXX_ERROR = An error has occured: %s.
+MATTERAMXX_SYSMSG_NOT_SENT = A message arrived, but it was marked as a system message, thus it will not be printed to the players.
 MATTERAMXX_API_SUPERCEDED = A plugin prevented the incoming message: %s
 MATTERAMXX_PLUGIN_LAG_STATS = Server is running at %d%%CPU and %dFPS.
 MATTERAMXX_PLUGIN_LAG_STFU = Server is not lagging. Check your computer and internet connection.
