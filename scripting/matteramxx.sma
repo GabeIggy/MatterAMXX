@@ -489,6 +489,7 @@ public say_message(id)
 
     grip_json_object_set_string(gJson, "text", sMessage);
     grip_json_object_set_string(gJson, "username", (id) ? sUserName : g_sSystemName);
+    grip_json_object_set_string(gJson, "userid", (id) ? sSteamId : "GAME_CONSOLE");
 
     if(g_iPluginFlags & AMX_FLAG_DEBUG)
         server_print("[MatterAMXX Debug] I'm going to send the message.");
