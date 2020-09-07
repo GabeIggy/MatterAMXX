@@ -71,7 +71,8 @@ new g_cvarBridgePort;
 new g_cvarBridgeGateway;
 new g_cvarToken;
 new g_cvarIncoming;
-new g_cvarIncoming_Chat_RefreshTime;
+new g_cvarIncoming_DontColorize;
+new g_cvarIncoming_RefreshTime;
 new g_cvarOutgoing;
 new g_cvarOutgoing_SystemUsername;
 new g_cvarOutgoing_Chat;
@@ -143,7 +144,8 @@ public plugin_init()
     g_cvarBridgeGateway = register_cvar("amx_matter_bridge_gateway", g_sGamename, FCVAR_PROTECTED);
     g_cvarToken = register_cvar("amx_matter_bridge_token", "", FCVAR_PROTECTED);
     g_cvarIncoming = register_cvar("amx_matter_bridge_incoming", "1");
-    g_cvarIncoming_Chat_RefreshTime = register_cvar("amx_matter_incoming_update_time", "3.0");
+    g_cvarIncoming_DontColorize = register_cvar("amx_matter_bridge_incoming_dont_colorize", "0");
+    g_cvarIncoming_RefreshTime = register_cvar("amx_matter_bridge_incoming_update_time", "3.0");
     g_cvarOutgoing = register_cvar("amx_matter_bridge_outgoing", "1");
     g_cvarOutgoing_SystemUsername = register_cvar("amx_matter_bridge_outgoing_system_username", sServername);
     g_cvarOutgoing_Chat = register_cvar("amx_matter_bridge_outgoing_chat", "1");
@@ -263,7 +265,7 @@ public plugin_cfg()
             }
 
             g_fRetryDelay = get_pcvar_float(g_cvarRetry_Delay);
-            g_fQueryDelay = get_pcvar_float(g_cvarIncoming_Chat_RefreshTime);
+            g_fQueryDelay = get_pcvar_float(g_cvarIncoming_RefreshTime);
 
             g_iPrintMessageForward = CreateMultiForward("matteramxx_print_message", ET_STOP, FP_STRING, FP_STRING, FP_STRING, FP_STRING);
 
@@ -385,9 +387,9 @@ public print_message(const sMessage[], sUsername[MAX_NAME_LENGTH], sProtocol[MAX
                 copy(sUsername, charsmax(sUsername), g_sSystemName);
             if(strlen(sProtocol) == 0)
                 copy(sProtocol, charsmax(sProtocol), g_sGamename);
-            formatex(sMessageNew, charsmax(sMessageNew), (cstrike_running()) ? "^4%s^1: %s" : "%s: %s", sUsername, sMessage);
+            formatex(sMessageNew, charsmax(sMessageNew), (cstrike_running() && !get_pcvar_bool(g_cvarIncoming_DontColorize)) ? "^4%s^1: %s" : "%s: %s", sUsername, sMessage);
             server_print(sMessageNew);
-            if(cstrike_running())
+            if(cstrike_running() && !get_pcvar_bool(g_cvarIncoming_DontColorize))
                 client_print_color(0, print_team_red, sMessageNew);
             else
                 client_print(0, print_chat, sMessageNew);
