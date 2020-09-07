@@ -265,7 +265,7 @@ public plugin_cfg()
             g_fRetryDelay = get_pcvar_float(g_cvarRetry_Delay);
             g_fQueryDelay = get_pcvar_float(g_cvarIncoming_Chat_RefreshTime);
 
-            g_iPrintMessageForward = CreateMultiForward("matteramxx_print_message", ET_STOP, FP_STRING, FP_STRING, FP_STRING);
+            g_iPrintMessageForward = CreateMultiForward("matteramxx_print_message", ET_STOP, FP_STRING, FP_STRING, FP_STRING, FP_STRING);
 
             set_task(g_fQueryDelay, "connect_api");
         }
@@ -349,10 +349,10 @@ public incoming_message()
 
     for(new x = 0; x < grip_json_array_get_count(gJson); x++)
     {
-        new sMessageBody[MESSAGE_LENGTH], sUsername[MAX_NAME_LENGTH], sProtocol[MAX_NAME_LENGTH], sMessageEvent[32];
+        new sMessageBody[MESSAGE_LENGTH], sUsername[MAX_NAME_LENGTH], sProtocol[MAX_NAME_LENGTH], sUserID[MAX_NAME_LENGTH];
         new GripJSONValue:jCurrentMessage = grip_json_array_get_value(gJson, x);
-        grip_json_object_get_string(jCurrentMessage, "userid", sMessageEvent, charsmax(sMessageEvent));
-        if(equal(sMessageEvent, SYSMES_ID))
+        grip_json_object_get_string(jCurrentMessage, "userid", sUserID, charsmax(sUserID));
+        if(equal(sUserID, SYSMES_ID))
         {
             server_print("[MatterAMXX] %L", LANG_SERVER, "MATTERAMXX_SYSMSG_NOT_SENT");
             return;
@@ -361,7 +361,7 @@ public incoming_message()
         grip_json_object_get_string(jCurrentMessage, "username", sUsername, charsmax(sUsername));
         grip_json_object_get_string(jCurrentMessage, "protocol", sProtocol, charsmax(sProtocol));
 
-        print_message(sMessageBody, sUsername, sProtocol);
+        print_message(sMessageBody, sUsername, sProtocol, sUserID);
 
         grip_destroy_json_value(jCurrentMessage);
     }
@@ -371,12 +371,12 @@ public incoming_message()
     set_task(g_fQueryDelay, "connect_api");
 }
 
-public print_message(const sMessage[], sUsername[MAX_NAME_LENGTH], sProtocol[MAX_NAME_LENGTH])
+public print_message(const sMessage[], sUsername[MAX_NAME_LENGTH], sProtocol[MAX_NAME_LENGTH], sUserID[MAX_NAME_LENGTH])
 {
     new iReturnVal = 0;
     new sMessageNew[MESSAGE_LENGTH];
     //copy(sMessageNew, MESSAGE_LENGTH, sMessage);
-    ExecuteForward(g_iPrintMessageForward, iReturnVal, sMessage, sUsername, sProtocol);
+    ExecuteForward(g_iPrintMessageForward, iReturnVal, sMessage, sUsername, sProtocol, sUserID);
     switch(iReturnVal)
     {
         case 0:
@@ -385,7 +385,7 @@ public print_message(const sMessage[], sUsername[MAX_NAME_LENGTH], sProtocol[MAX
                 copy(sUsername, charsmax(sUsername), g_sSystemName);
             if(strlen(sProtocol) == 0)
                 copy(sProtocol, charsmax(sProtocol), g_sGamename);
-            formatex(sMessageNew, charsmax(sMessageNew), (cstrike_running()) ? "^4(%s) %s^1: %s" : "(%s) %s: %s", sProtocol, sUsername, sMessage);
+            formatex(sMessageNew, charsmax(sMessageNew), (cstrike_running()) ? "^4%s^1: %s" : "%s: %s", sUsername, sMessage);
             server_print(sMessageNew);
             if(cstrike_running())
                 client_print_color(0, print_team_red, sMessageNew);

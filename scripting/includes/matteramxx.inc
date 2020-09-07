@@ -25,7 +25,7 @@ enum {
  * @param	    message[] - Message coming from Matterbridge.
  *
  */
-forward matteramxx_print_message(message[MESSAGE_LENGTH], username[MAX_NAME_LENGTH], protocol[MAX_NAME_LENGTH]);
+forward matteramxx_print_message(message[MESSAGE_LENGTH], username[MAX_NAME_LENGTH], protocol[MAX_NAME_LENGTH], userid[MAX_NAME_LENGTH]);
 
 /**
  * Method to send a message to the configured Matterbridge instance.
