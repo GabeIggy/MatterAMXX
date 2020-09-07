@@ -210,6 +210,9 @@ public bool:read_cvars(const filePath[])
 
 public matteramxx_print_message(message[MESSAGE_LENGTH], username[MAX_NAME_LENGTH], protocol[MAX_NAME_LENGTH])
 {
+    if(equali(protocol, "api"))
+        return MATTER_IGNORE; //we should not catch commands coming from any game server or integration
+    
     if(g_iPluginFlags & AMX_FLAG_DEBUG)
         server_print("[MatterAMXX RCON Debug] Message arrived %s", message);
     trim(message);
