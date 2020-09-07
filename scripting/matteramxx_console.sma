@@ -208,7 +208,7 @@ public bool:read_cvars(const filePath[])
     }
 }
 
-public matteramxx_print_message(message[MESSAGE_LENGTH], username[MAX_NAME_LENGTH], protocol[MAX_NAME_LENGTH])
+public matteramxx_print_message(message[MESSAGE_LENGTH], username[MAX_NAME_LENGTH], protocol[MAX_NAME_LENGTH], userid[MAX_NAME_LENGTH])
 {
     if(equali(protocol, "api"))
         return MATTER_IGNORE; //we should not catch commands coming from any game server or integration
@@ -226,7 +226,7 @@ public matteramxx_print_message(message[MESSAGE_LENGTH], username[MAX_NAME_LENGT
             server_print("[MatterAMXX RCON Debug] It is a valid prefix, checking if user is authorized.");
 
         new sTrieProtocol[MAX_NAME_LENGTH];
-        if(!get_pcvar_bool(g_cvarDontIgnoreObeyTo) || (TrieGetString(g_iTrieObeyTo, username, sTrieProtocol, charsmax(sTrieProtocol)) && equali(sTrieProtocol, protocol)))
+        if(!get_pcvar_bool(g_cvarDontIgnoreObeyTo) || (TrieGetString(g_iTrieObeyTo, userid, sTrieProtocol, charsmax(sTrieProtocol)) && equali(sTrieProtocol, protocol)))
         {
             replace_all(message, charsmax(message), sPrefix, "");
             trim(message);
@@ -264,7 +264,7 @@ public matteramxx_print_message(message[MESSAGE_LENGTH], username[MAX_NAME_LENGT
         else
         {
             if(g_iPluginFlags & AMX_FLAG_DEBUG)
-                server_print("[MatterAMXX RCON Debug] %s (%s)'s command got rejected.", username, protocol);
+                server_print("[MatterAMXX RCON Debug] %s (%s)'s (ID:%s) command got rejected.", username, userid, protocol);
             formatex(g_sResponseMessage, charsmax(g_sResponseMessage), "* %L", LANG_SERVER, "MATTERAMXX_PLUGIN_RCON_UNAUTHORIZED");
             matteramxx_send_message(g_sResponseMessage, _, _, true);
         }
