@@ -387,12 +387,26 @@ public print_message(const sMessage[], sUsername[MAX_NAME_LENGTH], sProtocol[MAX
                 copy(sUsername, charsmax(sUsername), g_sSystemName);
             if(strlen(sProtocol) == 0)
                 copy(sProtocol, charsmax(sProtocol), g_sGamename);
-            formatex(sMessageNew, charsmax(sMessageNew), (cstrike_running() && !get_pcvar_bool(g_cvarIncoming_DontColorize)) ? "^4%s^1: %s" : "%s: %s", sUsername, sMessage);
-            server_print(sMessageNew);
-            if(cstrike_running() && !get_pcvar_bool(g_cvarIncoming_DontColorize))
-                client_print_color(0, print_team_red, sMessageNew);
-            else
+
+            // apparently the super compact code didn't work on CS
+            // let's try it again
+
+            if(cstrike_running()) 
+            {
+                // counter strike is running
+                // todo: does DOD support color chat?
+
+                formatex(sMessageNew, charsmax(sMessageNew), get_pcvar_bool(g_cvarIncoming_DontColorize) ? "%s: %s" : "^4%s^1: %s", sUsername, sMessage); 
+
+                client_print_color(0, print_team_red, sMessageNew); 
+            }
+            else  
+            {
+                // counter strike is not running, so we wouldn't have colors even if we wanted them
+
+                formatex(sMessageNew, charsmax(sMessageNew), "%s: %s", sUsername, sMessage);
                 client_print(0, print_chat, sMessageNew);
+            } 
         }
         case 1:
         {
