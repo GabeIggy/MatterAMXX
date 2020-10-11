@@ -70,7 +70,7 @@ public say_message(id)
         if(containi(sMessage, "lag") != -1)
         {
             if(g_bRestartScheduled)
-                client_print(0, print_chat, "* %L", LANG_PLAYER, "MATTERAMXX_PLUGIN_RESTART_SCHEDULE");
+                client_print(0, print_chat, "* %L", LANG_PLAYER, "MATTERAMXX_PLUGIN_LAG_RESTART_SCHEDULE");
             else
                 set_task(2.0, "execute_lag"); //fixes SZ_GetSpace: tried to write to an uninitialized sizebuf_t: ???
         }
@@ -110,7 +110,7 @@ public execute_lag()
 
     if(floatround(cpu) > get_pcvar_num(g_cvarCpuThreshold) || fps_percent < get_pcvar_num(g_cvarFpsThreshold) || g_iPluginFlags & AMX_FLAG_DEBUG)
     {
-        client_print(0, print_chat, "* %L %L", LANG_PLAYER, "MATTERAMXX_PLUGIN_LAG_STATS", floatround(cpu), floatround(fps), LANG_PLAYER, "MATTERAMXX_PLUGIN_RESTART_SCHEDULE");
+        client_print(0, print_chat, "* %L %L", LANG_PLAYER, "MATTERAMXX_PLUGIN_LAG_STATS", floatround(cpu), floatround(fps), LANG_PLAYER, "MATTERAMXX_PLUGIN_LAG_RESTART_SCHEDULE");
         new s_toPing[MAX_NAME_LENGTH];
         get_pcvar_string(g_cvarToPing, s_toPing, charsmax(s_toPing));
         formatex(s_matterMessage, charsmax(s_matterMessage), "%s %L %L", s_toPing, LANG_SERVER, "MATTERAMXX_PLUGIN_LAG_STATS", floatround(cpu), floatround(fps), LANG_SERVER, "MATTERAMXX_PLUGIN_LAG_NOTIF");
