@@ -108,7 +108,7 @@ public execute_lag()
 
     new s_matterMessage[MESSAGE_LENGTH];
 
-    if(floatround(cpu) > get_pcvar_num(g_cvarCpuThreshold) || fps_percent < get_pcvar_num(g_cvarFpsThreshold) || g_iPluginFlags & AMX_FLAG_DEBUG)
+    if(floatround(cpu) > get_pcvar_num(g_cvarCpuThreshold) || fps_percent < get_pcvar_num(g_cvarFpsThreshold))
     {
         client_print(0, print_chat, "* %L %L", LANG_PLAYER, "MATTERAMXX_PLUGIN_LAG_STATS", floatround(cpu), floatround(fps), LANG_PLAYER, "MATTERAMXX_PLUGIN_LAG_RESTART_SCHEDULE");
         new s_toPing[MAX_NAME_LENGTH];
