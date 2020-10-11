@@ -357,6 +357,7 @@ public incoming_message()
         if(equal(sUserID, SYSMES_ID))
         {
             server_print("[MatterAMXX] %L", LANG_SERVER, "MATTERAMXX_SYSMSG_NOT_SENT");
+            set_task(g_fQueryDelay, "connect_api");
             return;
         }
         grip_json_object_get_string(jCurrentMessage, "text", sMessageBody, charsmax(sMessageBody));
