@@ -104,7 +104,10 @@ public execute_lag()
     new Float:fps = str_to_float(tokens[5]);
 
     new Float:ideal_sys_ticrate = get_cvar_num("sys_ticrate")*0.90;
-    new fps_percent = floatround((fps*100)/ideal_sys_ticrate);
+    server_print("[MatterAMXX Lag Checker Debug] Ideal ticrate is: %s", floatround(ideal_sys_ticrate));
+    new fps_percent = floatround((fps/100)*ideal_sys_ticrate);
+
+    server_print("[MatterAMXX Lag Checker Debug] Server is running at %s%% of desired cpu", fps_percent);
 
     new s_matterMessage[MESSAGE_LENGTH];
 
