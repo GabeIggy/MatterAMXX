@@ -397,6 +397,10 @@ public print_message(const sMessage[], sUsername[MAX_NAME_LENGTH], sProtocol[MAX
                 // counter strike is running
                 // todo: does DOD support color chat?
 
+                replace_all(sUsername, charsmax(sUsername), "!n", "^1");
+                replace_all(sUsername, charsmax(sUsername), "!t", "^3");
+                replace_all(sUsername, charsmax(sUsername), "!g", "^4");
+
                 formatex(sMessageNew, charsmax(sMessageNew), get_pcvar_bool(g_cvarIncoming_DontColorize) ? "%s: %s" : "^4%s^1: %s", sUsername, sMessage); 
 
                 client_print_color(0, print_team_red, sMessageNew); 
