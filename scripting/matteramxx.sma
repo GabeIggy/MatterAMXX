@@ -75,8 +75,7 @@ new g_cvarIncoming_DontColorize;
 new g_cvarIncoming_RefreshTime;
 new g_cvarOutgoing;
 new g_cvarOutgoing_SystemUsername;
-new g_cvarOutgoing_Chat;
-new g_cvarOutgoing_Chat_Team;
+new g_cvarOutgoing_Chat_Mode;
 new g_cvarOutgoing_Chat_SpamFil;
 new g_cvarOutgoing_Chat_ZeroifyAtSign;
 new g_cvarOutgoing_Kills;
@@ -125,6 +124,12 @@ new Regex:g_rAuthid_pattern;
 
 new const sHexTable[] = "0123456789ABCDEF";
 
+enum (*= 2)
+{
+    CHAT_TYPE_ALL = 1,
+    CHAT_TYPE_TEAM
+}
+
 public plugin_init()
 {
     new sServername[MAX_NAME_LENGTH];
@@ -148,8 +153,7 @@ public plugin_init()
     g_cvarIncoming_RefreshTime = register_cvar("amx_matter_bridge_incoming_update_time", "3.0");
     g_cvarOutgoing = register_cvar("amx_matter_bridge_outgoing", "1");
     g_cvarOutgoing_SystemUsername = register_cvar("amx_matter_bridge_outgoing_system_username", sServername);
-    g_cvarOutgoing_Chat = register_cvar("amx_matter_bridge_outgoing_chat", "1");
-    g_cvarOutgoing_Chat_Team = register_cvar("amx_matter_bridge_outgoing_chat_team", "1");
+    g_cvarOutgoing_Chat_Mode = register_cvar("amx_matter_bridge_outgoing_chat_mode", "3");
     g_cvarOutgoing_Chat_SpamFil = register_cvar("amx_matter_bridge_outgoing_chat_no_repeat", "1");
     g_cvarOutgoing_Chat_ZeroifyAtSign = register_cvar("amx_matter_bridge_outgoing_chat_zwsp_at", "1");
     g_cvarOutgoing_Kills = register_cvar("amx_matter_bridge_outgoing_kills", "1");
@@ -213,10 +217,11 @@ public plugin_cfg()
             
             formatex(g_sOutgoingUri, charsmax(g_sOutgoingUri), "%s/api/message", g_sBridgeUrl);
             
-            if(get_pcvar_bool(g_cvarOutgoing_Chat))
+            if(get_pcvar_num(g_cvarOutgoing_Chat_Mode) > 0)
             {
-                register_clcmd("say", "say_message");
-                if(get_pcvar_bool(g_cvarOutgoing_Chat_Team))
+                if(get_pcvar_num(g_cvarOutgoing_Chat_Mode) & CHAT_TYPE_ALL)
+                    register_clcmd("say", "say_message");
+                if(get_pcvar_num(g_cvarOutgoing_Chat_Mode) & CHAT_TYPE_TEAM)
                     register_clcmd("say_team", "say_message");
                     
                 g_rAuthid_pattern = regex_compile(REGEX_STEAMID_PATTERN);
