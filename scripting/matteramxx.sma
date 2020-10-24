@@ -72,6 +72,7 @@ new g_cvarBridgeGateway;
 new g_cvarToken;
 new g_cvarIncoming;
 new g_cvarIncoming_DontColorize;
+new g_cvarIncoming_IgnorePrefix;
 new g_cvarIncoming_RefreshTime;
 new g_cvarOutgoing;
 new g_cvarOutgoing_SystemUsername;
@@ -120,7 +121,8 @@ new Float:g_fQueryDelay;
 
 new g_iPluginFlags;
 
-new Regex:g_rAuthid_pattern;
+new Regex:g_rAuthId_Pattern;
+new Regex:g_rPrefix_Pattern;
 
 new const sHexTable[] = "0123456789ABCDEF";
 
@@ -150,6 +152,7 @@ public plugin_init()
     g_cvarToken = register_cvar("amx_matter_bridge_token", "", FCVAR_PROTECTED);
     g_cvarIncoming = register_cvar("amx_matter_bridge_incoming", "1");
     g_cvarIncoming_DontColorize = register_cvar("amx_matter_bridge_incoming_dont_colorize", "0");
+    g_cvarIncoming_IgnorePrefix = register_cvar("amx_matter_bridge_incoming_ignore_prefix", "!");
     g_cvarIncoming_RefreshTime = register_cvar("amx_matter_bridge_incoming_update_time", "3.0");
     g_cvarOutgoing = register_cvar("amx_matter_bridge_outgoing", "1");
     g_cvarOutgoing_SystemUsername = register_cvar("amx_matter_bridge_outgoing_system_username", sServername);
@@ -224,7 +227,7 @@ public plugin_cfg()
                 if(get_pcvar_num(g_cvarOutgoing_Chat_Mode) & CHAT_TYPE_TEAM)
                     register_clcmd("say_team", "say_message");
                     
-                g_rAuthid_pattern = regex_compile(REGEX_STEAMID_PATTERN);
+                g_rAuthId_Pattern = regex_compile(REGEX_STEAMID_PATTERN);
                 get_pcvar_string(g_cvarAvatarUrl, g_sAvatarUrl, charsmax(g_sAvatarUrl)); 
                 get_pcvar_string(g_cvarAutogenAvatarUrl, g_sAutogenAvatarUrl, charsmax(g_sAutogenAvatarUrl)); 
             }
@@ -275,6 +278,14 @@ public plugin_cfg()
             g_iPrintMessageForward = CreateMultiForward("matteramxx_print_message", ET_STOP, FP_STRING, FP_STRING, FP_STRING, FP_STRING);
 
             set_task(g_fQueryDelay, "connect_api");
+
+            new sRegexPrefix[32];
+            get_pcvar_string(g_cvarIncoming_IgnorePrefix, sRegexPrefix, charsmax(sRegexPrefix));
+
+            if(strlen(sRegexPrefix) > 0)
+                g_rPrefix_Pattern = regex_compile(sRegexPrefix);
+
+            g_rAuthId_Pattern = regex_compile(REGEX_STEAMID_PATTERN);
         }
 
         g_iPluginFlags = plugin_flags();
@@ -368,7 +379,9 @@ public incoming_message()
         grip_json_object_get_string(jCurrentMessage, "username", sUsername, charsmax(sUsername));
         grip_json_object_get_string(jCurrentMessage, "protocol", sProtocol, charsmax(sProtocol));
 
-        print_message(sMessageBody, sUsername, sProtocol, sUserID);
+        
+        if(!prefix_matches(sMessageBody))
+            print_message(sMessageBody, sUsername, sProtocol, sUserID);
 
         grip_destroy_json_value(jCurrentMessage);
     }
@@ -765,5 +778,11 @@ stock urlencode(const sString[], sResult[], len)
 
 stock is_valid_authid(authid[]) 
 {
-    return regex_match_c(authid, g_rAuthid_pattern) > 0;
+    return regex_match_c(authid, g_rAuthId_Pattern) > 0;
 }
+
+stock prefix_matches(message[]) 
+{
+    return regex_match_c(message, g_rPrefix_Pattern) > 0;
+}
+
