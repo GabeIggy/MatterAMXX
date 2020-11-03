@@ -129,7 +129,9 @@ new const sHexTable[] = "0123456789ABCDEF";
 enum (*= 2)
 {
     CHAT_TYPE_ALL = 1,
-    CHAT_TYPE_TEAM
+    CHAT_TYPE_TEAM,
+//    CHAT_TYPE_ALL_SYSMSG,
+//    CHAT_TYPE_TEAM_SYSMSG
 }
 
 public plugin_init()
@@ -379,9 +381,7 @@ public incoming_message()
         grip_json_object_get_string(jCurrentMessage, "username", sUsername, charsmax(sUsername));
         grip_json_object_get_string(jCurrentMessage, "protocol", sProtocol, charsmax(sProtocol));
 
-        
-        if(!prefix_matches(sMessageBody))
-            print_message(sMessageBody, sUsername, sProtocol, sUserID);
+        print_message(sMessageBody, sUsername, sProtocol, sUserID);
 
         grip_destroy_json_value(jCurrentMessage);
     }
@@ -401,6 +401,9 @@ public print_message(const sMessage[], sUsername[MAX_NAME_LENGTH], sProtocol[MAX
     {
         case 0:
         {
+            if(prefix_matches(sMessage))
+                return;
+
             if(strlen(sUsername) == 0)
                 copy(sUsername, charsmax(sUsername), g_sSystemName);
             if(strlen(sProtocol) == 0)
@@ -516,9 +519,7 @@ public say_message(id)
                 server_print("[MatterAMXX Debug] Resulting avatar URL is %s.", sAvatarUrlFull);
 
             if(strlen(sAvatarUrlFull) > 0)
-            {
                 grip_json_object_set_string(gJson, "avatar", sAvatarUrlFull);
-            }
         }
         else if(strlen(g_sSystemAvatarUrl) > 0)
         {
@@ -569,7 +570,7 @@ public player_killed(id, idattacker)
             get_user_name(idattacker, sAttackerName, charsmax(sAttackerName));
     }
     else
-        pev(idattacker, pev_classname, sAttackerName, charsmax(sAttackerName));
+        pev(idattacker, pev_classname, sAttackerName, charsmax(sAttackerName)); //todo: get the monster name in Sven Co-op
 
     replace_all(sUserName, charsmax(sUserName), "^"", "");
     replace_all(sAttackerName, charsmax(sAttackerName), "^"", ""); 
@@ -781,7 +782,7 @@ stock is_valid_authid(authid[])
     return regex_match_c(authid, g_rAuthId_Pattern) > 0;
 }
 
-stock prefix_matches(message[]) 
+stock prefix_matches(const message[]) 
 {
     return regex_match_c(message, g_rPrefix_Pattern) > 0;
 }
