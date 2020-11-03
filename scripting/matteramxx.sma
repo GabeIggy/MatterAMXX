@@ -311,7 +311,7 @@ public join_delay_done()
     {
         new sMapName[32], sMessage[MESSAGE_LENGTH];
         get_mapname(sMapName, charsmax(sMapName));
-        formatex(sMessage, charsmax(sMessage), "* Map changed to %s", sMapName);
+        formatex(sMessage, charsmax(sMessage), "%L", LANG_SERVER, "MATTERAMXX_MESSAGE_MAP_CHANGED", sMapName);
         send_message_custom(sMessage, g_sSystemName, g_sSystemAvatarUrl, true);
     }
 }
@@ -574,7 +574,7 @@ public player_killed(id, idattacker)
     replace_all(sUserName, charsmax(sUserName), "^"", "");
     replace_all(sAttackerName, charsmax(sAttackerName), "^"", ""); 
 
-    formatex(sMessage, charsmax(sMessage), "%s got killed by %s!", sUserName, sAttackerName);
+    formatex(sMessage, charsmax(sMessage), "%L", LANG_SERVER, "MATTERAMXX_MESSAGE_KILLED", sUserName, sAttackerName);
 
     new GripJSONValue:gJson = grip_json_init_object();
 
@@ -659,9 +659,9 @@ public client_disconnected(id)
         replace_all(sUserName, charsmax(sUserName), "^"", "");
 
         if(get_pcvar_bool(g_cvarOutgoing_JoinQuit_ShowCount))
-            formatex(sMessage, charsmax(sMessage), "%s has left the game. [%d/%d]", sUserName, get_playersnum_ex(GetPlayers_ExcludeBots)-1, get_maxplayers());
+            formatex(sMessage, charsmax(sMessage), "%L [%d/%d]", LANG_SERVER, "MATTERAMXX_MESSAGE_LEFT", sUserName, get_playersnum_ex(GetPlayers_ExcludeBots)-1, get_maxplayers());
         else
-            formatex(sMessage, charsmax(sMessage), "%s has left the game.", sUserName);
+            formatex(sMessage, charsmax(sMessage), "%L", LANG_SERVER, "MATTERAMXX_MESSAGE_LEFT", sUserName);
         g_bUserConnected[id] = false;
         
         new GripJSONValue:gJson = grip_json_init_object();
@@ -689,9 +689,9 @@ public client_putinserver(id)
         replace_all(sUserName, charsmax(sUserName), "^"", "");
 
         if(get_pcvar_bool(g_cvarOutgoing_JoinQuit_ShowCount))
-            formatex(sMessage, charsmax(sMessage), "%s joined the game. [%d/%d]", sUserName, get_playersnum_ex(GetPlayers_ExcludeBots), get_maxplayers());
+            formatex(sMessage, charsmax(sMessage), "%L [%d/%d]", LANG_SERVER, "MATTERAMXX_MESSAGE_JOINED", sUserName, get_playersnum_ex(GetPlayers_ExcludeBots), get_maxplayers());
         else
-            formatex(sMessage, charsmax(sMessage), "%s joined the game.", sUserName);
+            formatex(sMessage, charsmax(sMessage), "%L", LANG_SERVER, "MATTERAMXX_MESSAGE_JOINED", sUserName);
         
         g_bUserConnected[id] = true;
         g_sLastMessages[id] = "";
