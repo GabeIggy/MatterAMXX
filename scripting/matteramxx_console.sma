@@ -265,7 +265,7 @@ public matteramxx_print_message(message[MESSAGE_LENGTH], username[MAX_NAME_LENGT
         {
             if(g_iPluginFlags & AMX_FLAG_DEBUG)
                 server_print("[MatterAMXX RCON Debug] %s (%s)'s (ID:%s) command got rejected.", username, userid, protocol);
-            formatex(g_sResponseMessage, charsmax(g_sResponseMessage), "* %L", LANG_SERVER, "MATTERAMXX_PLUGIN_RCON_UNAUTHORIZED");
+            formatex(g_sResponseMessage, charsmax(g_sResponseMessage), "* %L", LANG_SERVER, random(101) > 99 ? "MATTERAMXX_PLUGIN_RCON_UNAUTHORIZED" : "MATTERAMXX_PLUGIN_RCON_HAL", username);
             matteramxx_send_message(g_sResponseMessage, _, _, true);
         }
         return MATTER_SUPERCEDE;
