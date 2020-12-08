@@ -69,6 +69,7 @@ new g_cvarBridgeProtocol;
 new g_cvarBridgeHost;
 new g_cvarBridgePort;
 new g_cvarBridgeGateway;
+new g_cvarBridgeSystemGateway;
 new g_cvarToken;
 new g_cvarIncoming;
 new g_cvarIncoming_DontColorize;
@@ -104,6 +105,7 @@ new g_sAutogenAvatarUrl[BASE_URL_LENGTH];
 new g_sSystemAvatarUrl[BASE_URL_LENGTH];
 new g_sSystemName[MAX_NAME_LENGTH];
 new g_sGateway[MAX_NAME_LENGTH];
+new g_sSystemGateway[MAX_NAME_LENGTH];
 new g_sGamename[MAX_NAME_LENGTH];
 
 new g_sLastMessages[MAX_PLAYERS+1][MESSAGE_LENGTH];
@@ -151,6 +153,7 @@ public plugin_init()
     g_cvarBridgePort = register_cvar("amx_matter_bridge_port", "1337", FCVAR_PROTECTED);
     g_cvarDeprecatedBridgeUrl = register_cvar("amx_matter_bridge_url", "", FCVAR_PROTECTED);
     g_cvarBridgeGateway = register_cvar("amx_matter_bridge_gateway", g_sGamename, FCVAR_PROTECTED);
+    g_cvarBridgeSystemGateway = register_cvar("amx_matter_bridge_system_gateway", "", FCVAR_PROTECTED);
     g_cvarToken = register_cvar("amx_matter_bridge_token", "", FCVAR_PROTECTED);
     g_cvarIncoming = register_cvar("amx_matter_bridge_incoming", "1");
     g_cvarIncoming_DontColorize = register_cvar("amx_matter_bridge_incoming_dont_colorize", "0");
@@ -218,6 +221,7 @@ public plugin_cfg()
             }
 
             get_pcvar_string(g_cvarBridgeGateway, g_sGateway, charsmax(g_sGateway));
+            get_pcvar_string(g_cvarBridgeSystemGateway, g_sSystemGateway, charsmax(g_sSystemGateway));
             get_pcvar_string(g_cvarOutgoing_SystemUsername, g_sSystemName, charsmax(g_sSystemName));
             
             formatex(g_sOutgoingUri, charsmax(g_sOutgoingUri), "%s/api/message", g_sBridgeUrl);
@@ -535,7 +539,7 @@ public say_message(id)
 
     if(g_iPluginFlags & AMX_FLAG_DEBUG)
         server_print("[MatterAMXX Debug] I'm going to send the message.");
-    send_message_rest(gJson);
+    send_message_rest(gJson, false);
 
     return PLUGIN_CONTINUE;
 }
@@ -597,20 +601,7 @@ public send_message_custom(const sMessage[], const sUsername[], const sAvatar[],
     grip_json_object_set_string(gJson, "avatar", strlen(sAvatar) > 0 ? sAvatar : g_sSystemAvatarUrl);
     grip_json_object_set_string(gJson, "userid", is_system ? SYSMES_ID : "");
 
-    send_message_rest(gJson);
-}
-
-public send_message_rest(GripJSONValue:gJson)
-{
-    grip_json_object_set_string(gJson, "gateway", g_sGateway);
-    grip_json_object_set_string(gJson, "protocol", g_sGamename);
-
-    new GripBody:gPayload = grip_body_from_json(gJson);
-
-    g_gripOutgoingHandle = grip_request(g_sOutgoingUri, gPayload, GripRequestTypePost, "outgoing_message", g_gOutgoingHeader);
-
-    grip_destroy_body(gPayload);
-    grip_destroy_json_value(gJson);
+    send_message_rest(gJson, is_system);
 }
 
 public outgoing_message()
@@ -775,6 +766,19 @@ stock urlencode(const sString[], sResult[], len)
             sResult[to++] = c;
         }
     }
+}
+
+stock send_message_rest(GripJSONValue:gJson, is_system = true)
+{
+    grip_json_object_set_string(gJson, "gateway", is_system && strlen(g_sSystemGateway) > 0 ? g_sSystemGateway : g_sGateway);
+    grip_json_object_set_string(gJson, "protocol", g_sGamename);
+
+    new GripBody:gPayload = grip_body_from_json(gJson);
+
+    g_gripOutgoingHandle = grip_request(g_sOutgoingUri, gPayload, GripRequestTypePost, "outgoing_message", g_gOutgoingHeader);
+
+    grip_destroy_body(gPayload);
+    grip_destroy_json_value(gJson);
 }
 
 stock is_valid_authid(authid[]) 
