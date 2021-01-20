@@ -186,7 +186,7 @@ public plugin_cfg()
     {
         new sToken[TOKEN_LENGTH];
         get_pcvar_string(g_cvarDeprecatedBridgeUrl, g_sBridgeUrl, charsmax(g_sBridgeUrl));
-        if(strlen(g_sBridgeUrl) > 0)
+        if(!empty(g_sBridgeUrl))
             server_print("[MatterAMXX Warning] amx_matter_bridge_url is deprecated. This will throw an error in future MatterBridge versions, please update your cvars.");
         else
         {
@@ -195,7 +195,7 @@ public plugin_cfg()
             get_pcvar_string(g_cvarBridgeHost, sBridgeHost, charsmax(sBridgeHost));
             get_pcvar_string(g_cvarBridgePort, sBridgePort, charsmax(sBridgePort));
             formatex(g_sBridgeUrl, charsmax(g_sBridgeUrl), "%s://%s", sBridgeProtocol, sBridgeHost);
-            if(strlen(sBridgePort) > 0)
+            if(!empty(sBridgePort))
             {
                 add(g_sBridgeUrl, charsmax(g_sBridgeUrl), ":");
                 add(g_sBridgeUrl, charsmax(g_sBridgeUrl), sBridgePort);
@@ -210,7 +210,7 @@ public plugin_cfg()
 
             get_pcvar_string(g_cvarSystemAvatarUrl, g_sSystemAvatarUrl, charsmax(g_sSystemAvatarUrl));
 
-            if(strlen(sToken) > 0)
+            if(!empty(sToken))
             {
                 new sTokenHeader[JSON_PARAMETER_LENGTH];
                 formatex(sTokenHeader, charsmax(sTokenHeader), "Bearer %s", sToken);
@@ -267,7 +267,7 @@ public plugin_cfg()
        
             g_gIncomingHeader = grip_create_default_options();
 
-            if(strlen(sToken) > 0)
+            if(!empty(sToken))
             {
                 new sTokenHeader[JSON_PARAMETER_LENGTH];
                 formatex(sTokenHeader, charsmax(sTokenHeader), "Bearer %s", sToken);
@@ -284,7 +284,7 @@ public plugin_cfg()
             new sRegexPrefix[32];
             get_pcvar_string(g_cvarIncoming_IgnorePrefix, sRegexPrefix, charsmax(sRegexPrefix));
 
-            if(strlen(sRegexPrefix) > 0)
+            if(!empty(sRegexPrefix))
                 g_rPrefix_Pattern = regex_compile(sRegexPrefix);
 
             g_rAuthId_Pattern = regex_compile(REGEX_STEAMID_PATTERN);
@@ -352,7 +352,7 @@ public incoming_message()
 
     gJson = grip_json_parse_string(sIncomingMessage, sJsonError, charsmax(sJsonError));
 
-    if (strlen(sJsonError) > 0)
+    if (!empty(sJsonError))
     {
         server_print("[MatterAMXX] %L", LANG_SERVER, "MATTERAMXX_INVALID");
         set_task(g_fQueryDelay, "connect_api");
@@ -406,9 +406,9 @@ public print_message(const sMessage[], sUsername[MAX_NAME_LENGTH], sProtocol[MAX
             if(prefix_matches(sMessage))
                 return;
 
-            if(strlen(sUsername) == 0)
+            if(empty(sUsername))
                 copy(sUsername, charsmax(sUsername), g_sSystemName);
-            if(strlen(sProtocol) == 0)
+            if(empty(sProtocol))
                 copy(sProtocol, charsmax(sProtocol), g_sGamename);
 
             // apparently the super compact code didn't work on CS
@@ -458,7 +458,7 @@ public say_message(id)
     if(g_iPluginFlags & AMX_FLAG_DEBUG)
         server_print("[MatterAMXX Debug] Message ^"%s^" was sent.", sMessage);
 
-    if (strlen(sMessage) == 0 || (get_pcvar_bool(g_cvarOutgoing_Chat_SpamFil) && equal(sMessage, g_sLastMessages[id])))
+    if (empty(sMessage) || (get_pcvar_bool(g_cvarOutgoing_Chat_SpamFil) && equal(sMessage, g_sLastMessages[id])))
     {
         if(g_iPluginFlags & AMX_FLAG_DEBUG)
         {
@@ -493,7 +493,7 @@ public say_message(id)
             server_print("[MatterAMXX Debug] Steam ID is %s.", sSteamId);
         }
 
-        if (strlen(sSteamId) > 0)
+        if (!empty(sSteamId))
         {
             if(g_iPluginFlags & AMX_FLAG_DEBUG)
                 server_print("[MatterAMXX Debug] Steam ID is from a player.");
@@ -502,14 +502,14 @@ public say_message(id)
             {
                 if(g_iPluginFlags & AMX_FLAG_DEBUG)
                     server_print("[MatterAMXX Debug] User is authenticated.");
-                if (strlen(g_sAvatarUrl) > 0)
+                if (!empty(g_sAvatarUrl))
                     formatex(sAvatarUrlFull, charsmax(sAvatarUrlFull), g_sAvatarUrl, sSteamId);
             }
             else
             {
                 if(g_iPluginFlags & AMX_FLAG_DEBUG)
                     server_print("[MatterAMXX Debug] User not is authenticated.");
-                if (strlen(g_sAutogenAvatarUrl) > 0)
+                if (!empty(g_sAutogenAvatarUrl))
                 {
                     new sEncodedName[MAX_NAME_LENGTH];
                     urlencode(sUserName, sEncodedName, charsmax(sEncodedName));
@@ -520,10 +520,10 @@ public say_message(id)
             if(g_iPluginFlags & AMX_FLAG_DEBUG)
                 server_print("[MatterAMXX Debug] Resulting avatar URL is %s.", sAvatarUrlFull);
 
-            if(strlen(sAvatarUrlFull) > 0)
+            if(!empty(sAvatarUrlFull))
                 grip_json_object_set_string(gJson, "avatar", sAvatarUrlFull);
         }
-        else if(strlen(g_sSystemAvatarUrl) > 0)
+        else if(!empty(g_sSystemAvatarUrl))
         {
             if(g_iPluginFlags & AMX_FLAG_DEBUG)
                 server_print("[MatterAMXX Debug] The server sent this message.");
@@ -583,7 +583,7 @@ public player_killed(id, idattacker)
 
     grip_json_object_set_string(gJson, "text", sMessage);
     grip_json_object_set_string(gJson, "username", g_sSystemName);
-    if(strlen(g_sSystemAvatarUrl) > 0)
+    if(!empty(g_sSystemAvatarUrl))
         grip_json_object_set_string(gJson, "avatar", g_sSystemAvatarUrl);
     grip_json_object_set_string(gJson, "userid", SYSMES_ID);
 
@@ -595,11 +595,11 @@ public send_message_custom(const sMessage[], const sUsername[], const sAvatar[],
     new GripJSONValue:gJson = grip_json_init_object();
 
     grip_json_object_set_string(gJson, "text", sMessage);
-    grip_json_object_set_string(gJson, "username", strlen(sUsername) > 0 ? sUsername : g_sSystemName);
-    grip_json_object_set_string(gJson, "avatar", strlen(sAvatar) > 0 ? sAvatar : g_sSystemAvatarUrl);
+    grip_json_object_set_string(gJson, "username", empty(sUsername) ? g_sSystemName : sUsername);
+    grip_json_object_set_string(gJson, "avatar", empty(sAvatar) ? g_sSystemAvatarUrl : sAvatar);
     grip_json_object_set_string(gJson, "userid", is_system ? SYSMES_ID : "");
 
-    send_message_rest(gJson, sGateway);
+    send_message_rest(gJson, empty(sGateway) ? g_sGateway : sGateway);
 }
 
 public outgoing_message()
@@ -657,7 +657,7 @@ public client_disconnected(id)
         new GripJSONValue:gJson = grip_json_init_object();
         grip_json_object_set_string(gJson, "text", sMessage);
         grip_json_object_set_string(gJson, "username", g_sSystemName);
-        if(strlen(g_sSystemAvatarUrl) > 0)
+        if(!empty(g_sSystemAvatarUrl))
             grip_json_object_set_string(gJson, "avatar", g_sSystemAvatarUrl);
         grip_json_object_set_string(gJson, "userid", SYSMES_ID);
 
@@ -689,7 +689,7 @@ public client_putinserver(id)
         new GripJSONValue:gJson = grip_json_init_object();
         grip_json_object_set_string(gJson, "text", sMessage);
         grip_json_object_set_string(gJson, "username", g_sSystemName);
-        if(strlen(g_sSystemAvatarUrl) > 0)
+        if(!empty(g_sSystemAvatarUrl))
             grip_json_object_set_string(gJson, "avatar", g_sSystemAvatarUrl);
         grip_json_object_set_string(gJson, "userid", SYSMES_ID);
 
@@ -789,3 +789,7 @@ stock prefix_matches(const message[])
     return regex_match_c(message, g_rPrefix_Pattern) > 0;
 }
 
+stock empty(const string[])
+{
+    return !string[0];
+}
