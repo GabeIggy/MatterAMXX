@@ -69,7 +69,6 @@ new g_cvarBridgeProtocol;
 new g_cvarBridgeHost;
 new g_cvarBridgePort;
 new g_cvarBridgeGateway;
-new g_cvarBridgeSystemGateway;
 new g_cvarToken;
 new g_cvarIncoming;
 new g_cvarIncoming_DontColorize;
@@ -105,7 +104,6 @@ new g_sAutogenAvatarUrl[BASE_URL_LENGTH];
 new g_sSystemAvatarUrl[BASE_URL_LENGTH];
 new g_sSystemName[MAX_NAME_LENGTH];
 new g_sGateway[MAX_NAME_LENGTH];
-new g_sSystemGateway[MAX_NAME_LENGTH];
 new g_sGamename[MAX_NAME_LENGTH];
 
 new g_sLastMessages[MAX_PLAYERS+1][MESSAGE_LENGTH];
@@ -153,7 +151,6 @@ public plugin_init()
     g_cvarBridgePort = register_cvar("amx_matter_bridge_port", "1337", FCVAR_PROTECTED);
     g_cvarDeprecatedBridgeUrl = register_cvar("amx_matter_bridge_url", "", FCVAR_PROTECTED);
     g_cvarBridgeGateway = register_cvar("amx_matter_bridge_gateway", g_sGamename, FCVAR_PROTECTED);
-    g_cvarBridgeSystemGateway = register_cvar("amx_matter_bridge_system_gateway", "", FCVAR_PROTECTED);
     g_cvarToken = register_cvar("amx_matter_bridge_token", "", FCVAR_PROTECTED);
     g_cvarIncoming = register_cvar("amx_matter_bridge_incoming", "1");
     g_cvarIncoming_DontColorize = register_cvar("amx_matter_bridge_incoming_dont_colorize", "0");
@@ -221,7 +218,6 @@ public plugin_cfg()
             }
 
             get_pcvar_string(g_cvarBridgeGateway, g_sGateway, charsmax(g_sGateway));
-            get_pcvar_string(g_cvarBridgeSystemGateway, g_sSystemGateway, charsmax(g_sSystemGateway));
             get_pcvar_string(g_cvarOutgoing_SystemUsername, g_sSystemName, charsmax(g_sSystemName));
             
             formatex(g_sOutgoingUri, charsmax(g_sOutgoingUri), "%s/api/message", g_sBridgeUrl);
@@ -256,7 +252,7 @@ public plugin_cfg()
                     new sMapName[32], sMessage[MESSAGE_LENGTH];
                     get_mapname(sMapName, charsmax(sMapName));
                     formatex(sMessage, charsmax(sMessage), "* Map changed to %s", sMapName);
-                    send_message_custom(sMessage, g_sSystemName, g_sSystemAvatarUrl, true);
+                    send_message_custom(sMessage, g_sSystemName, g_sSystemAvatarUrl, true, g_sGateway);
                 }
                 g_bJoinDelayDone = true;
             }
@@ -318,7 +314,7 @@ public join_delay_done()
         new sMapName[32], sMessage[MESSAGE_LENGTH];
         get_mapname(sMapName, charsmax(sMapName));
         formatex(sMessage, charsmax(sMessage), "%L", LANG_SERVER, "MATTERAMXX_MESSAGE_MAP_CHANGED", sMapName);
-        send_message_custom(sMessage, g_sSystemName, g_sSystemAvatarUrl, true);
+        send_message_custom(sMessage, g_sSystemName, g_sSystemAvatarUrl, true, g_sGateway);
     }
 }
 
@@ -539,7 +535,7 @@ public say_message(id)
 
     if(g_iPluginFlags & AMX_FLAG_DEBUG)
         server_print("[MatterAMXX Debug] I'm going to send the message.");
-    send_message_rest(gJson, false);
+    send_message_rest(gJson, g_sGateway);
 
     return PLUGIN_CONTINUE;
 }
@@ -589,10 +585,10 @@ public player_killed(id, idattacker)
         grip_json_object_set_string(gJson, "avatar", g_sSystemAvatarUrl);
     grip_json_object_set_string(gJson, "userid", SYSMES_ID);
 
-    send_message_rest(gJson);
+    send_message_rest(gJson, g_sGateway);
 }
 
-public send_message_custom(const sMessage[], const sUsername[], const sAvatar[], const bool:is_system)
+public send_message_custom(const sMessage[], const sUsername[], const sAvatar[], const bool:is_system, const sGateway[])
 {
     new GripJSONValue:gJson = grip_json_init_object();
 
@@ -601,7 +597,7 @@ public send_message_custom(const sMessage[], const sUsername[], const sAvatar[],
     grip_json_object_set_string(gJson, "avatar", strlen(sAvatar) > 0 ? sAvatar : g_sSystemAvatarUrl);
     grip_json_object_set_string(gJson, "userid", is_system ? SYSMES_ID : "");
 
-    send_message_rest(gJson, is_system);
+    send_message_rest(gJson, sGateway);
 }
 
 public outgoing_message()
@@ -663,7 +659,7 @@ public client_disconnected(id)
             grip_json_object_set_string(gJson, "avatar", g_sSystemAvatarUrl);
         grip_json_object_set_string(gJson, "userid", SYSMES_ID);
 
-        send_message_rest(gJson);
+        send_message_rest(gJson, g_sGateway);
     }
 }
 
@@ -695,7 +691,7 @@ public client_putinserver(id)
             grip_json_object_set_string(gJson, "avatar", g_sSystemAvatarUrl);
         grip_json_object_set_string(gJson, "userid", SYSMES_ID);
 
-        send_message_rest(gJson);
+        send_message_rest(gJson, g_sGateway);
     }
 }
 
@@ -768,9 +764,9 @@ stock urlencode(const sString[], sResult[], len)
     }
 }
 
-stock send_message_rest(GripJSONValue:gJson, is_system = true)
+stock send_message_rest(GripJSONValue:gJson, const gateway[])
 {
-    grip_json_object_set_string(gJson, "gateway", is_system && strlen(g_sSystemGateway) > 0 ? g_sSystemGateway : g_sGateway);
+    grip_json_object_set_string(gJson, "gateway", gateway);
     grip_json_object_set_string(gJson, "protocol", g_sGamename);
 
     new GripBody:gPayload = grip_body_from_json(gJson);

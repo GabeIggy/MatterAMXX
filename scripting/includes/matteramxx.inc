@@ -32,10 +32,11 @@ forward matteramxx_print_message(message[MESSAGE_LENGTH], username[MAX_NAME_LENG
  * @param		message[] - Message you want to send
  * @param		username[] - Username that will appear in the protocols
  * @param		avatar[] - URL pointing to the avatar of this "user" (On protocols that support it)
- * @param		is_system[] - If true, message won't be printed in other game servers
+ * @param		is_system - If true, message won't be printed in other game servers
+ * @param		gateway[] - Specify the gateway we should send this message, main if empty
  *
  */
-stock matteramxx_send_message(const message[], const username[] = "", const avatar[] = "", bool:is_system = false)
+stock matteramxx_send_message(const message[], const username[] = "", const avatar[] = "", const bool:is_system = false, const gateway[] = "")
 {
     if(callfunc_begin("send_message_custom","matteramxx.amxx") == 1) 
     {
