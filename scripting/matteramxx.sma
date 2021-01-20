@@ -472,7 +472,8 @@ public say_message(id)
     new sMessage[MESSAGE_LENGTH], sUserName[MAX_NAME_LENGTH], sSteamId[MAX_NAME_LENGTH];
     read_args(sMessage, charsmax(sMessage));
 
-    replace_all(sMessage, charsmax(sMessage), "^"", "");
+    remove_quotes(sMessage);
+    replace_all(sMessage, charsmax(sMessage), "^"", "\^"");
 
     if(get_pcvar_bool(g_cvarOutgoing_Chat_ZeroifyAtSign))
         replace_all(sMessage, charsmax(sMessage), "@", "@​");
