@@ -40,10 +40,11 @@ stock matteramxx_send_message(const message[], const username[] = "", const avat
 {
     if(callfunc_begin("send_message_custom","matteramxx.amxx") == 1) 
     {
-        callfunc_push_str(message)
-        callfunc_push_str(username)
-        callfunc_push_str(avatar)
-        callfunc_push_int(is_system)
-        callfunc_end()
+        callfunc_push_str(message);
+        callfunc_push_str(username);
+        callfunc_push_str(avatar);
+        callfunc_push_int(is_system);
+        callfunc_push_str(gateway);
+        callfunc_end();
     }
 }  
