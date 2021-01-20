@@ -55,8 +55,8 @@ new const g_sDangerousCommands[][] = {
         "restart",      //server crashes
         "quit",         //server crashes
         "map",          //server crashes
-        "version"       //server crashes
-        "listip"        //server crashes
+        "version",       //server crashes
+        "listip",        //server crashes
         "listid"        //server crashes
     };
 
