@@ -59,7 +59,7 @@ public say_message(id)
     new sMessage[MESSAGE_LENGTH];
     read_args(sMessage, charsmax(sMessage));
 
-    if (strlen(sMessage) == 0)
+    if (empty(sMessage))
         return PLUGIN_CONTINUE;
 
     if(id)
@@ -142,4 +142,9 @@ public map_end()
 {
     server_cmd("quit");
     server_exec();
+}
+
+stock empty(const string[])
+{
+    return !string[0];
 }
