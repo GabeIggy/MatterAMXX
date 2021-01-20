@@ -17,7 +17,7 @@ MATTERAMXX_PLUGIN_LAG_RESTART_SCHEDULE = The server scheduled a restart after th
 MATTERAMXX_PLUGIN_RCON_UNAUTHORIZED = You don't have access to this command.
 MATTERAMXX_PLUGIN_RCON_DENIED = This command will not be executed.
 MATTERAMXX_PLUGIN_RCON_HAL = I'm sorry, %s. I'm afraid I can't do that.
-MATTERAMXX_PLUGIN_RCON_NO_OUTPUT = For security, the command will be executed but no output will be shown.
+MATTERAMXX_PLUGIN_RCON_NO_OUTPUT = The command is not supported, the command will be executed but no output will be shown.
 
 [es]
 MATTERAMXX_RETRYING = Reintentando en %d segundos...
@@ -29,7 +29,7 @@ MATTERAMXX_API_SUPERCEDED = Un plugin evitó que el siguiente mensaje se enviara
 MATTERAMXX_MESSAGE_KILLED = ¡%s murió a manos de %s!
 MATTERAMXX_MESSAGE_JOINED = %s se ha unido al servidor.
 MATTERAMXX_MESSAGE_LEFT = %s ha abandonado el servidor.
-MATTERAMXX_MESSAGE_MAP_CHANGED = Map changed to %s.
+MATTERAMXX_MESSAGE_MAP_CHANGED = El mapa fue cambiado a %s.
 MATTERAMXX_PLUGIN_LAG_STATS = El servidor está corriendo a %i%% de CPU y a %iFPS.
 MATTERAMXX_PLUGIN_LAG_STFU = El servidor no está lag. Revisa tu sistema y conexión a internet.
 MATTERAMXX_PLUGIN_LAG_NOTIF = El servidor no puede soportar la carga.
@@ -37,7 +37,7 @@ MATTERAMXX_PLUGIN_LAG_RESTART_SCHEDULE = El servidor se reiniciará después de 
 MATTERAMXX_PLUGIN_RCON_UNAUTHORIZED = No tienes acceso a este comando.
 MATTERAMXX_PLUGIN_RCON_DENIED = Este comando no será ejecutado.
 MATTERAMXX_PLUGIN_RCON_HAL = Lo siento, %s. Me temo que no puedo hacer eso.
-MATTERAMXX_PLUGIN_RCON_NO_OUTPUT = El comando se ejecutará pero no se mostrará una respuesta por seguridad.
+MATTERAMXX_PLUGIN_RCON_NO_OUTPUT = El comando se ejecutará pero no se mostrará una respuesta debido a una limitación.
 
 [ro]
 MATTERAMXX_RETRYING =  Incearca din nou in %d secunde...

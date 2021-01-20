@@ -56,6 +56,8 @@ new const g_sDangerousCommands[][] = {
         "quit",         //server crashes
         "map",          //server crashes
         "version"       //server crashes
+        "listip"        //server crashes
+        "listid"        //server crashes
     };
 
 public plugin_init()
