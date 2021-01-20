@@ -194,7 +194,7 @@ public plugin_cfg()
             get_pcvar_string(g_cvarBridgeProtocol, sBridgeProtocol, charsmax(sBridgeProtocol));
             get_pcvar_string(g_cvarBridgeHost, sBridgeHost, charsmax(sBridgeHost));
             get_pcvar_string(g_cvarBridgePort, sBridgePort, charsmax(sBridgePort));
-            formatex(g_sBridgeUrl, charsmax(g_sBridgeUrl), "%s://%s", g_cvarBridgeProtocol, g_cvarBridgeHost);
+            formatex(g_sBridgeUrl, charsmax(g_sBridgeUrl), "%s://%s", sBridgeProtocol, sBridgeHost);
             if(strlen(sBridgePort) > 0)
             {
                 add(g_sBridgeUrl, charsmax(g_sBridgeUrl), ":");
@@ -325,6 +325,8 @@ public map_end()
 
 public connect_api()
 {
+    if(g_iPluginFlags & AMX_FLAG_DEBUG)
+        server_print("[MatterAMXX Debug] Trying to connect to ^"%s^".", g_sIncomingUri);
     g_gripIncomingHandle = grip_request(g_sIncomingUri, Empty_GripBody, GripRequestTypeGet, "incoming_message", g_gIncomingHeader);
 }
 
