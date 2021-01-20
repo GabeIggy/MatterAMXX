@@ -9,6 +9,12 @@
     #define MAX_NAME_LENGTH 32
 #endif
 
+#pragma reqlib "matteramxx"
+
+#if !defined AMXMODX_NOAUTOLOAD
+   #pragma loadlib "matteramxx"
+#endif
+
 enum {
   MATTER_IGNORE = 0,
   MATTER_SUPERCEDE,
@@ -36,15 +42,4 @@ forward matteramxx_print_message(message[MESSAGE_LENGTH], username[MAX_NAME_LENG
  * @param		gateway[] - Specify the gateway we should send this message, main if empty
  *
  */
-stock matteramxx_send_message(const message[], const username[] = "", const avatar[] = "", const bool:is_system = false, const gateway[] = "")
-{
-    if(callfunc_begin("send_message_custom","matteramxx.amxx") == 1) 
-    {
-        callfunc_push_str(message);
-        callfunc_push_str(username);
-        callfunc_push_str(avatar);
-        callfunc_push_int(is_system);
-        callfunc_push_str(gateway);
-        callfunc_end();
-    }
-}  
+native matteramxx_send_message(const message[], const username[] = "", const avatar[] = "", const bool:is_system = false, const gateway[] = "");

@@ -134,6 +134,12 @@ enum (*= 2)
 //    CHAT_TYPE_TEAM_SYSMSG
 }
 
+public plugin_natives()
+{
+    register_library("matteramxx");
+    register_native("matteramxx_send_message", "send_message_custom");
+}
+
 public plugin_init()
 {
     new sServername[MAX_NAME_LENGTH];
@@ -252,7 +258,15 @@ public plugin_cfg()
                     new sMapName[32], sMessage[MESSAGE_LENGTH];
                     get_mapname(sMapName, charsmax(sMapName));
                     formatex(sMessage, charsmax(sMessage), "* Map changed to %s", sMapName);
-                    send_message_custom(sMessage, g_sSystemName, g_sSystemAvatarUrl, true, g_sGateway);
+                    
+                    new GripJSONValue:gJson = grip_json_init_object();
+                    grip_json_object_set_string(gJson, "text", sMessage);
+                    grip_json_object_set_string(gJson, "username", g_sSystemName);
+                    if(!empty(g_sSystemAvatarUrl))
+                        grip_json_object_set_string(gJson, "avatar", g_sSystemAvatarUrl);
+                    grip_json_object_set_string(gJson, "userid", SYSMES_ID);
+
+                    send_message_rest(gJson, g_sGateway);
                 }
                 g_bJoinDelayDone = true;
             }
@@ -314,7 +328,15 @@ public join_delay_done()
         new sMapName[32], sMessage[MESSAGE_LENGTH];
         get_mapname(sMapName, charsmax(sMapName));
         formatex(sMessage, charsmax(sMessage), "%L", LANG_SERVER, "MATTERAMXX_MESSAGE_MAP_CHANGED", sMapName);
-        send_message_custom(sMessage, g_sSystemName, g_sSystemAvatarUrl, true, g_sGateway);
+
+        new GripJSONValue:gJson = grip_json_init_object();
+        grip_json_object_set_string(gJson, "text", sMessage);
+        grip_json_object_set_string(gJson, "username", g_sSystemName);
+        if(!empty(g_sSystemAvatarUrl))
+            grip_json_object_set_string(gJson, "avatar", g_sSystemAvatarUrl);
+        grip_json_object_set_string(gJson, "userid", SYSMES_ID);
+
+        send_message_rest(gJson, g_sGateway);
     }
 }
 
@@ -590,8 +612,17 @@ public player_killed(id, idattacker)
     send_message_rest(gJson, g_sGateway);
 }
 
-public send_message_custom(const sMessage[], const sUsername[], const sAvatar[], const bool:is_system, const sGateway[])
+public send_message_custom(iPlugin, iParams)
 {
+    // we can manage backwards compatiblity ths way
+    new sMessage[MESSAGE_LENGTH], sUsername[MAX_NAME_LENGTH], sAvatar[TARGET_URL_LENGTH], sGateway[MAX_NAME_LENGTH];
+    
+    get_string(1, sMessage, charsmax(sMessage));
+    get_string(2, sUsername, charsmax(sUsername));
+    get_string(3, sAvatar, charsmax(sAvatar));
+    new is_system = get_param(4);
+    get_string(5, sGateway, charsmax(sGateway));
+
     new GripJSONValue:gJson = grip_json_init_object();
 
     grip_json_object_set_string(gJson, "text", sMessage);
