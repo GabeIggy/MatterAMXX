@@ -374,7 +374,7 @@ public incoming_message()
 
     gJson = grip_json_parse_string(sIncomingMessage, sJsonError, charsmax(sJsonError));
 
-    if (!empty(sJsonError))
+    if(!empty(sJsonError))
     {
         server_print("[MatterAMXX] %L", LANG_SERVER, "MATTERAMXX_INVALID");
         set_task(g_fQueryDelay, "connect_api");
@@ -481,7 +481,7 @@ public say_message(id)
     if(g_iPluginFlags & AMX_FLAG_DEBUG)
         server_print("[MatterAMXX Debug] Message ^"%s^" was sent.", sMessage);
 
-    if (empty(sMessage) || (get_pcvar_bool(g_cvarOutgoing_Chat_SpamFil) && equal(sMessage, g_sLastMessages[id])))
+    if(empty(sMessage) || (get_pcvar_bool(g_cvarOutgoing_Chat_SpamFil) && equal(sMessage, g_sLastMessages[id])))
     {
         if(g_iPluginFlags & AMX_FLAG_DEBUG)
         {
@@ -516,7 +516,7 @@ public say_message(id)
             server_print("[MatterAMXX Debug] Steam ID is %s.", sSteamId);
         }
 
-        if (!empty(sSteamId))
+        if(!empty(sSteamId))
         {
             if(g_iPluginFlags & AMX_FLAG_DEBUG)
                 server_print("[MatterAMXX Debug] Steam ID is from a player.");
@@ -525,14 +525,14 @@ public say_message(id)
             {
                 if(g_iPluginFlags & AMX_FLAG_DEBUG)
                     server_print("[MatterAMXX Debug] User is authenticated.");
-                if (!empty(g_sAvatarUrl))
+                if(!empty(g_sAvatarUrl))
                     formatex(sAvatarUrlFull, charsmax(sAvatarUrlFull), g_sAvatarUrl, sSteamId);
             }
             else
             {
                 if(g_iPluginFlags & AMX_FLAG_DEBUG)
                     server_print("[MatterAMXX Debug] User not is authenticated.");
-                if (!empty(g_sAutogenAvatarUrl))
+                if(!empty(g_sAutogenAvatarUrl))
                 {
                     new sEncodedName[MAX_NAME_LENGTH];
                     urlencode(sUserName, sEncodedName, charsmax(sEncodedName));
@@ -737,15 +737,15 @@ stock get_colorless_name(id, name[], len)
 	// Clear out color codes
 	new i, j;
 	new const hat[3] = "^^";
-	while (name[i])
+	while(name[i])
 	{
-		if (name[i] == hat[0] && name[i + 1] >= '0' && name[i + 1] <= '9')
+		if(name[i] == hat[0] && name[i + 1] >= '0' && name[i + 1] <= '9')
 		{
 			i++;
 		}
 		else
 		{
-			if (j != i)
+			if(j != i)
 				name[j] = name[i];
 			j++;
 		}
@@ -759,34 +759,34 @@ stock urlencode(const sString[], sResult[], len)
 {
     new from, c, to;
 
-    while (from < len)
+    while(from < len)
     {
         c = sString[from++];
-        if (c == 0)
+        if(c == 0)
         {
             sResult[to++] = c;
             break;
         }
-        else if (c == ' ')
+        else if(c == ' ')
         {
             sResult[to++] = '_';
         }
-        else if (!(0 <= c <= 255))
+        else if(!(0 <= c <= 255))
         { // UTF-8 Fix (Doesn't encode put .)
             sResult[to++] = '_';
         }
-        else if ((c < '0' && c != '-' && c != '.') ||
+        else if((c < '0' && c != '-' && c != '.') ||
                 (c < 'A' && c > '9') ||
                 (c > 'Z' && c < 'a' && c != '_') ||
                 (c > 'z'))
         {
-            if ((to + 3) > len)
+            if((to + 3) > len)
             {
                 sResult[to] = 0;
                 break;
             }
             // UTF-8 Fix - Need to check real c values.
-            /* if (c < 0) c = 256 + c; */
+            /* if(c < 0) c = 256 + c; */
             sResult[to++] = '_';
             sResult[to++] = sHexTable[c >> 4];
             sResult[to++] = sHexTable[c & 15];
