@@ -179,8 +179,8 @@ public plugin_init()
 
     register_dictionary("matteramxx.txt");
 
-    //TS doesn't support rendering % 
-    if(is_running("ts"))
+    //TS and SC don't support rendering % 
+    if(is_running("ts") || is_running("svencoop"))
         register_dictionary("matteramxx_old.txt");
 
     register_cvar("amx_matter_bridge_version", MATTERAMXX_PLUGIN_VERSION, FCVAR_SERVER);
